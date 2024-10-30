@@ -1,0 +1,23 @@
+/* بسم الله الرحمن الرحيم */
+/* la ilaha illa Allah Mohammed rassoul Allah */
+
+body {
+    height: 100vh;
+    align-content: center;
+}
+
+form {
+    width: 20vw;
+    padding: 5vw;
+    margin: auto;
+    border-width: .2rem;
+    border-style: solid;
+
+    input, button {
+        width: 15vw;
+        margin: 0 auto;
+        display: block;
+        text-align: center;
+    }
+}
+

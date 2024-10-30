@@ -19,6 +19,13 @@ pub fn build(b: *std.Build) !void {
 
     // ^ Add all dependencies before `jetzig.jetzigInit()` ^
 
+    const pg = b.dependency("pg", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    // the executable from your call to b.addExecutable(...)
+    exe.root_module.addImport("pg", pg.module("pg"));
+
     try jetzig.jetzigInit(b, exe, .{});
 
     b.installArtifact(exe);

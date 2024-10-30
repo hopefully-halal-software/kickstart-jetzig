@@ -27,6 +27,10 @@
             .url = "https://github.com/jetzig-framework/jetzig/archive/f971f18a605f477b73dd9d81bea093d345016251.tar.gz",
             .hash = "122076f1843e9145b45f9cb2a0bfa6f8638c316b053b1a74309faec58021e104058f",
         },
+        .pg = .{
+            .url = "git+https://github.com/karlseguin/pg.zig?ref=master#54bcb8f93e0f2c7aff2614f2e5666380a4559c38",
+            .hash = "12205351dc0e6c8ce45912518ecf254f58d5a340d2f53c23b2bb1f14c51c4b5a279a",
+        },
     },
     .paths = .{
         "build.zig",

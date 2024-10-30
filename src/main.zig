@@ -7,6 +7,13 @@ const zmd = @import("zmd");
 pub const routes = @import("routes");
 pub const static = @import("static");
 
+const pg = @import("pg");
+
+pub const GlobalStruct = struct {
+    pool: *pg.Pool,
+};
+pub const Global = GlobalStruct;
+
 // Override default settings in `jetzig.config` here:
 pub const jetzig_options = struct {
     /// Middleware chain. Add any custom middleware here, or use middleware provided in
@@ -190,8 +197,22 @@ pub fn main() !void {
     const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
     defer if (builtin.mode == .Debug) std.debug.assert(gpa.deinit() == .ok);
 
+    var pool: *pg.Pool = undefined;
+    pool = try pg.Pool.init(allocator, .{ .size = jetzig_options.worker_count, .connect = .{
+        .port = 5432,
+        .host = "127.0.0.1",
+    }, .auth = .{
+        .username = "postgres",
+        .database = "bismi_allah_db",
+        .password = "bismi_allah",
+        .timeout = 10_000,
+    } });
+
     var app = try jetzig.init(allocator);
     defer app.deinit();
 
-    try app.start(routes, .{});
+    var global: GlobalStruct = undefined;
+    global = GlobalStruct{ .pool = pool };
+
+    try app.start(routes, .{ .global = &global });
 }
