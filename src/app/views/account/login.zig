@@ -33,21 +33,31 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const user = db.User.getAuth(conn, login, password, email, data) catch |err| switch (err) {
         db.User.Error.WrongLogin, db.User.Error.WrongEmail, db.User.Error.WrongPassword => {
-            // it is not set so the user does not know which was incorrect
             try root.put("message", data.string("login, email or password were incorrect"));
             return request.render(.unauthorized);
         },
         else => return err,
     };
 
+    var code_2fa_buffer: [3]u8 = undefined;
+    std.crypto.random.bytes(&code_2fa_buffer);
+    // const code_2fa = std.fmt.bytesToHex(code_2fa_buffer, .lower);
+    // try data.string(code_2fa)
+    const code_2fa = data.string(&std.fmt.bytesToHex(code_2fa_buffer, .lower));
+
     const session = try request.session();
 
-    // var session_2fa = try data.object();
-    // try session.put("2fa", session_2fa);
-    // try session_2fa.put("user", user);
-    try session.put("user", user);
+    var session_2fa_login = try data.object();
+    try session_2fa_login.put("user", user);
+    try session_2fa_login.put("code", code_2fa);
+    try session.put("2fa_login", session_2fa_login);
 
-    return request.redirect("/account", .moved_permanently);
+    try root.put("code_2fa", code_2fa);
+
+    const mailer = request.mail("2fa", .{ .subject = "email verification for login", .to = &.{email} });
+    try mailer.deliver(.background, .{});
+
+    return request.redirect("/account/login/2fa", .moved_permanently);
 
     // try root.put("message", "alhamdo li Allah cerdintials were correct<br>now you will -incha2Allah- be redirected to confirm 2fa code");
     // return request.render(.created);

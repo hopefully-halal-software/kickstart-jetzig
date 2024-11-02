@@ -31,9 +31,17 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var conn = try request.global.pool.acquire();
     defer conn.release();
 
-    if (try db.User.exists(conn, "login")) {
+    if (try db.User.exists(conn, login)) {
         try root.put("message", data.string("login is already used by another user"));
+        std.debug.print("alhamdo li Allah used login already exists\n", .{});
+        return request.render(.conflict);
     }
+
+    var code_2fa_buffer: [3]u8 = undefined;
+    std.crypto.random.bytes(&code_2fa_buffer);
+    // const code_2fa = std.fmt.bytesToHex(code_2fa_buffer, .lower);
+    // try data.string(code_2fa)
+    const code_2fa = data.string(&std.fmt.bytesToHex(code_2fa_buffer, .lower));
 
     const session = try request.session();
 
@@ -43,9 +51,14 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try user.put("password", data.string(password));
 
     var session_2fa_register = try data.object();
-    try session.put("2fa_register", session_2fa_register);
     try session_2fa_register.put("user", user);
-    try session.put("user", user);
+    try session_2fa_register.put("code", code_2fa);
+    try session.put("2fa_register", session_2fa_register);
+
+    try root.put("code_2fa", code_2fa);
+
+    const mailer = request.mail("2fa", .{ .subject = "email verification for registration", .to = &.{email} });
+    try mailer.deliver(.background, .{});
 
     return request.redirect("/account/register/2fa", .moved_permanently);
 

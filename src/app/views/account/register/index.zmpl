@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>idz login</title>
+  <title>login</title>
   <link href="/bismi_allah_login.css" rel="stylesheet">
 </head>
 <body>
