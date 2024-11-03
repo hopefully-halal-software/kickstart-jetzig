@@ -52,7 +52,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     };
 
     try session.put("user", user);
-    try session.put("2fa_login", data.string(""));
+    _ = try session.remove("2fa_login");
 
     return request.redirect("/account", .moved_permanently);
 }

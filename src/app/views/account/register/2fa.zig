@@ -52,7 +52,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         return request.render(.internal_server_error);
     };
 
-    try session.put("2fa_register", data.string(""));
+    _ = try session.remove("2fa_register");
 
     var conn = try request.global.pool.acquire();
     defer conn.release();
