@@ -33,7 +33,6 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     if (try db.User.exists(conn, login)) {
         try root.put("message", data.string("login is already used by another user"));
-        std.debug.print("alhamdo li Allah used login already exists\n", .{});
         return request.render(.conflict);
     }
 
