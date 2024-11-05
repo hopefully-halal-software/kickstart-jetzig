@@ -13,11 +13,16 @@ form {
     border-width: .2rem;
     border-style: solid;
 
-    input, button {
+    input, nav {
         width: 15vw;
         margin: 0 auto;
         display: block;
         text-align: center;
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-between;
     }
 }
 
