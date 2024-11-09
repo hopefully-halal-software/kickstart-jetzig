@@ -1,13 +1,16 @@
+// بسم الله الرحمن الرحيم
+// la ilaha illa Allah Mohammed rassoul Allah
 const std = @import("std");
 const builtin = @import("builtin");
+
+const db = @import("app/lib/db.zig");
+const pg = @import("pg");
 
 const jetzig = @import("jetzig");
 const zmd = @import("zmd");
 
 pub const routes = @import("routes");
 pub const static = @import("static");
-
-const pg = @import("pg");
 
 pub const GlobalStruct = struct {
     pool: *pg.Pool,
@@ -207,6 +210,9 @@ pub fn main() !void {
         .password = "bismi_allah",
         .timeout = 10_000,
     } });
+
+    try db.initDb(pool);
+    defer db.deinit(pool);
 
     var app = try jetzig.init(allocator);
     defer app.deinit();
