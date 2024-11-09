@@ -1,3 +1,5 @@
+// بسم الله الرحمن الرحيم
+// la ilaha illa Allah Mohammed rassoul Allah
 .{
     // This is the default name used by packages depending on this one. For
     // example, when a user runs `zig fetch --save <url>`, this field is used
@@ -6,30 +8,20 @@
     //
     // It is redundant to include "zig" in this name because it is already
     // within the Zig package namespace.
-    .name = "kickstart-jetzig",
+    .name = "jetzig",
 
     // This is a [Semantic Version](https://semver.org/).
     // In a future version of Zig it will be used for package deduplication.
     .version = "0.0.0",
 
-    // This field is optional.
-    // This is currently advisory only; Zig does not yet do anything
-    // with this value.
-    //.minimum_zig_version = "0.11.0",
-
-    // This field is optional.
-    // Each dependency must either provide a `url` and `hash`, or a `path`.
-    // `zig build --fetch` can be used to fetch all dependencies of a package, recursively.
-    // Once all dependencies are fetched, `zig build` no longer requires
-    // internet connectivity.
     .dependencies = .{
         .jetzig = .{
-            .url = "https://github.com/jetzig-framework/jetzig/archive/2d8ca9214305fedc9bfd8efa48fa2b2ee057b615.tar.gz",
-            .hash = "12209ea0ec871fccd1c9df7ae7283a24e2bb84274d92c75fcdb3c8598f76a931213a",
+            .url = "https://github.com/jetzig-framework/jetzig/archive/ab84e23a8b63ccae0b0848824f60de322b07de71.tar.gz",
+            .hash = "122001b6f612e93a9327f2bb62fd293af4f1497c5e33464817f18fef132d5a7980c4",
         },
         .pg = .{
-            .url = "git+https://github.com/karlseguin/pg.zig?ref=master#54bcb8f93e0f2c7aff2614f2e5666380a4559c38",
-            .hash = "12205351dc0e6c8ce45912518ecf254f58d5a340d2f53c23b2bb1f14c51c4b5a279a",
+            .url = "git+https://github.com/karlseguin/pg.zig?ref=master#9226a0a256cd000eee2f9652c8c03af8dcbed79b",
+            .hash = "12202b30ebf018ca398f665e51cae6d000fdfe2d08d5ec369e3110f762c548b154a4",
         },
     },
     .paths = .{
