@@ -10,7 +10,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const session = try request.session();
 
-    if (try session.get("2fa_register")) |_2fa_register| {
+    if (session.get("2fa_register")) |_2fa_register| {
         const user = _2fa_register.getT(.object, "user") orelse return request.redirect("/account/register", .moved_permanently);
 
         const email = user.getT(.string, "email") orelse return request.redirect("/account/register", .moved_permanently);
@@ -39,7 +39,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     };
 
     const session = try request.session();
-    const _2fa_register = (try session.get("2fa_register")) orelse return request.redirect("/account/register", .moved_permanently);
+    const _2fa_register = (session.get("2fa_register")) orelse return request.redirect("/account/register", .moved_permanently);
     const code_2fa_session = _2fa_register.getT(.string, "code") orelse return request.redirect("/account/register", .moved_permanently);
 
     if (!std.mem.eql(u8, code_2fa_input, code_2fa_session)) {

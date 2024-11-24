@@ -9,6 +9,7 @@
 <body>
   <main>
     <form method="post" action="#">
+      {{context.authenticityFormElement()}}
       <input type="text" name="login" placeholder="login" required>
       <input type="text" name="email" placeholder="email" required>
       <input type="password" name="password" placeholder="password" required>

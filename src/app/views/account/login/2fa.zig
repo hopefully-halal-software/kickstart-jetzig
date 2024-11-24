@@ -9,7 +9,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const session = try request.session();
 
-    if (try session.get("2fa_login")) |_2fa_login| {
+    if (session.get("2fa_login")) |_2fa_login| {
         const user = _2fa_login.getT(.object, "user") orelse return request.redirect("/account/login", .moved_permanently);
 
         const email = user.getT(.string, "email") orelse return request.redirect("/account/login", .moved_permanently);
@@ -38,7 +38,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     };
 
     const session = try request.session();
-    const _2fa_login = (try session.get("2fa_login")) orelse return request.redirect("/account/login", .moved_permanently);
+    const _2fa_login = (session.get("2fa_login")) orelse return request.redirect("/account/login", .moved_permanently);
     const code_2fa_session = _2fa_login.getT(.string, "code") orelse return request.redirect("/account/login", .moved_permanently);
 
     if (!std.mem.eql(u8, code_2fa_input, code_2fa_session)) {

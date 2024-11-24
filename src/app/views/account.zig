@@ -11,7 +11,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     // redirect them to "/account/login"
     const session = try request.session();
 
-    if (try session.get("user")) |user| {
+    if (session.get("user")) |user| {
         var root = try data.root(.object);
         try root.put("user", user);
     } else return request.redirect("/account/login", .moved_permanently);
