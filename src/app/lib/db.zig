@@ -1,10 +1,9 @@
 // بسم الله الرحمن الرحيم
 // la ilaha illa Allah Mohammed rassoul Allah
 const std = @import("std");
+const builtin = @import("builtin");
 const jetzig = @import("jetzig");
 const pg = @import("pg");
-
-pub var pool: ?*pg.Pool = null;
 
 var gpa: std.heap.GeneralPurposeAllocator(.{}) = undefined;
 var allocator: std.mem.Allocator = undefined;
@@ -29,8 +28,24 @@ var allocator: std.mem.Allocator = undefined;
 //     conn.deinit();
 // }
 
-pub fn deinit() void {
-    pool.?.deinit();
+pub fn deinit(pool: *pg.Pool) void {
+    pool.deinit();
+}
+
+pub fn initDb(pool: *pg.Pool) !void {
+    var conn = try pool.acquire();
+    defer conn.release();
+
+    try User.initDb(conn);
+
+    if (builtin.mode == .Debug) {
+        _ = conn.exec("INSERT INTO users VALUES (1, 'bismi_allah_user', 'ouhamouy10@gmail.com', '5a26cff1f99a18b5ccdd414d4e967898fb5fee3ef47bae419d2fbbadf4a60890', '123456789012')", .{}) catch |err| {
+            if (err != error.PG) return err;
+            if (conn.err) |pge| std.log.err("alhamdo li Allah error: {s}\n", .{pge.message});
+        };
+
+        // init other data
+    }
 }
 
 /// you need to call `conn.release()`
@@ -52,6 +67,21 @@ pub const User = struct {
     };
     const password_salt_length = 12;
     const max_password_size = 128;
+
+    fn initDb(conn: *pg.Conn) !void {
+        _ = conn.exec(
+            \\CREATE TABLE IF NOT EXISTS users (                                                                    
+            \\  id SERIAL PRIMARY KEY,
+            \\  login VARCHAR(24) NOT NULL UNIQUE,
+            \\  email VARCHAR(50) NOT NULL,
+            \\  password_hash CHAR(64) NOT NULL,
+            \\  password_salt CHAR(12) NOT NULL
+            \\)
+        , .{}) catch |err| {
+            if (err != error.PG) return err;
+            if (conn.err) |pge| std.log.err("alhamdo li Allah error: {s}\n", .{pge.message});
+        };
+    }
 
     /// when logging in -incha2Allah-
     pub fn getAuth(conn: *pg.Conn, login: []const u8, password: []const u8, email: []const u8, data: *jetzig.Data) !*jetzig.Data.Value {
