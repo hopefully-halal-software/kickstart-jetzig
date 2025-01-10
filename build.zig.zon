@@ -16,12 +16,12 @@
 
     .dependencies = .{
         .jetzig = .{
-            .url = "https://github.com/jetzig-framework/jetzig/archive/835885a9474bb067e0d2322015db52f5f8fcbe21.tar.gz",
-            .hash = "1220d099da14c21874668fdabb04c58fff1643cd3e1be6e65fbd803e1333ba78c870",
+            .url = "https://github.com/jetzig-framework/jetzig/archive/5ebb60d7593ed8c0ba567889c7dc6ce8065b0742.tar.gz",
+            .hash = "1220f444298a1b18b9f3a87cc9c439ca50edaeb31d10ae6bd98edb64f7d37a197cb7",
         },
         .pg = .{
-            .url = "git+https://github.com/karlseguin/pg.zig?ref=master#f376f4b30c63f1fdf90bc3afe246d3bc4175cd46",
-            .hash = "12200a55304988e942015b6244570b2dc0e87e5764719c9e7d5c812cd7ad34f6b138",
+            .url = "git+https://github.com/karlseguin/pg.zig?ref=master#2135214fc52790ba841a6d11c79f4b3c6a6024e9",
+            .hash = "122067796195e1b4b691f1684332b9c7c497715c8dfca63cb88dfec3330f76697a49",
         },
     },
     .paths = .{

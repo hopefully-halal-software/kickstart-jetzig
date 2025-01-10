@@ -1,3 +1,5 @@
+// بسم الله الرحمن الرحيم
+// la ilaha illa Allah Mohammed rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
 
@@ -6,7 +8,7 @@ pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{});
 
     const exe = b.addExecutable(.{
-        .name = "kickstart-jetzig",
+        .name = "jetzig",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,

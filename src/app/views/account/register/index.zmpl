@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>idz register</title>
-  <link href="/bismi_allah_login.css" rel="stylesheet">
-</head>
-<body>
-  <main>
+  <link href="/bismi_allah_form.css" rel="stylesheet">
     <form method="post" action="#">
       {{context.authenticityFormElement()}}
       <input type="text" name="login" placeholder="login" required>
+      <input type="text" name="name" placeholder="name" required>
       <input type="text" name="email" placeholder="email" required>
       <input type="password" name="password" placeholder="password" required>
       <nav>
@@ -18,6 +10,3 @@
         <a href="/account/login">login</a>
       </nav>
     </form>
-  </main>
-</body>
-</html>

@@ -5,20 +5,16 @@ const jetzig = @import("jetzig");
 
 pub const layout = "main";
 
-/// `src/app/views/root.zig` represents the root URL `/`
-/// The `index` view function is invoked when when the HTTP verb is `GET`.
-/// Other view types are invoked either by passing a resource ID value (e.g. `/1234`) or by using
-/// a different HTTP verb:
-///
-/// GET / => index(request, data)
-/// GET /1234 => get(id, request, data)
-/// POST / => post(request, data)
-/// PUT /1234 => put(id, request, data)
-/// PATCH /1234 => patch(id, request, data)
-/// DELETE /1234 => delete(id, request, data)
-pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    _ = data;
-
-
+pub fn index(request: *jetzig.Request) !jetzig.View {
     return request.render(.ok);
+}
+
+// bismi Allah
+// only Allah knows how I am gonna test it
+test "bismi_allah_index" {
+    var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
+    defer app.deinit();
+
+    const response = try app.request(.GET, "/", .{});
+    try response.expectStatus(.ok);
 }

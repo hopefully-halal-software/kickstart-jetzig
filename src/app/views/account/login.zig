@@ -5,6 +5,8 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 const db = @import("../../lib/db.zig");
 
+pub const layout = "main";
+
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     _ = data;
     return request.render(.ok);
@@ -13,27 +15,21 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = try data.root(.object);
 
-    const params = try request.params();
-
-    const login = params.getT(.string, "login") orelse {
-        try root.put("message", data.string("you need to pass arguments 'login'"));
-        return request.render(.bad_request);
+    const Params = struct {
+        email: []const u8,
+        password: []const u8,
     };
-    const email = params.getT(.string, "email") orelse {
-        try root.put("message", data.string("you need to pass arguments 'email'"));
-        return request.render(.bad_request);
-    };
-    const password = params.getT(.string, "password") orelse {
-        try root.put("message", data.string("you need to pass arguments 'password'"));
-        return request.render(.bad_request);
+    const params = try request.expectParams(Params) orelse {
+        try root.put("message", data.string("you need to pass arguments 'email' and 'password'"));
+        return request.fail(.unprocessable_entity);
     };
 
-    var conn = try request.global.pool.acquire();
+    var conn = try db.acquire(request);
     defer conn.release();
 
-    const user = db.User.getAuth(conn, login, password, email, data) catch |err| switch (err) {
-        db.User.Error.WrongLogin, db.User.Error.WrongEmail, db.User.Error.WrongPassword => {
-            try root.put("message", data.string("login, email or password were incorrect"));
+    const user = db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
+        db.User.Error.WrongEmail, db.User.Error.WrongPassword => {
+            try root.put("message", data.string("email or password were incorrect"));
             return request.render(.unauthorized);
         },
         else => return err,
@@ -54,11 +50,73 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     try root.put("code_2fa", code_2fa);
 
-    const mailer = request.mail("2fa", .{ .subject = "email verification for login", .to = &.{email} });
+    const mailer = request.mail("2fa", .{ .subject = "idz: email verification for login", .to = &.{params.email} });
     try mailer.deliver(.background, .{});
 
-    return request.redirect("/account/login/2fa", .moved_permanently);
+    return request.redirect("/account/login/2fa", .found);
 
     // try root.put("message", "alhamdo li Allah cerdintials were correct<br>now you will -incha2Allah- be redirected to confirm 2fa code");
     // return request.render(.created);
+}
+
+test "bismi_allah_index" {
+    var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
+    defer app.deinit();
+
+    const response = try app.request(.GET, "/account/login", .{});
+    try response.expectStatus(.ok);
+}
+
+test "bismi_allah_post: without required params" {
+    var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
+    defer app.deinit();
+    // to set anti_csrf token
+    _ = try app.request(.GET, "/account/login", .{});
+
+    const token = app.session.getT(.string, jetzig.authenticity_token_name).?;
+
+    const response = try app.request(.POST, "/account/login", .{
+        .params = .{ ._jetzig_authenticity_token = token },
+    });
+    try response.expectStatus(.unprocessable_entity);
+}
+
+test "bismi_allah_post: with required params (wrong info)" {
+    var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
+    defer app.deinit();
+    // to set anti_csrf token
+    _ = try app.request(.GET, "/account/login", .{});
+
+    const token = app.session.getT(.string, jetzig.authenticity_token_name).?;
+
+    const response = try app.request(.POST, "/account/login", .{
+        .params = .{
+            ._jetzig_authenticity_token = token,
+            .email = "wrongmail@bismi_allah.com",
+            .password = "wrong_password",
+        },
+    });
+    // incha2Allah will be changed to use .unprocessable_entity
+    try response.expectStatus(.unauthorized);
+    try response.expectBodyContains("email or password were incorrect");
+    try std.testing.expectEqual(null, app.session.get("2fa_login"));
+}
+
+test "bismi_allah_post: with required params (correct info)" {
+    var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
+    defer app.deinit();
+    // to set anti_csrf token
+    _ = try app.request(.GET, "/account/login", .{});
+
+    const token = app.session.getT(.string, jetzig.authenticity_token_name).?;
+
+    const response = try app.request(.POST, "/account/login", .{
+        .params = .{
+            ._jetzig_authenticity_token = token,
+            .email = "ouhamouy10@gmail.com",
+            .password = "bismi_allah",
+        },
+    });
+    try response.expectStatus(.found);
+    try std.testing.expect(null != app.session.get("2fa_login"));
 }
