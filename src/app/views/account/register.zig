@@ -3,8 +3,8 @@
 
 const std = @import("std");
 const jetzig = @import("jetzig");
-const db = @import("../../lib/db.zig");
-const @"2fa" = @import("../../lib/2fa.zig");
+
+const lib = @import("../../lib/all.zig");
 
 pub const layout = "main";
 
@@ -26,10 +26,10 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         return request.fail(.unprocessable_entity);
     };
 
-    var conn = try db.acquire(request);
+    var conn = try lib.db.acquire(request);
     defer conn.release();
 
-    if (try db.User.existsByEmail(conn, params.email)) {
+    if (try lib.db.User.existsByEmail(conn, params.email)) {
         try root.put("message", data.string("email is already used by another user"));
         return request.render(.conflict);
     }
@@ -42,7 +42,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var payload = try data.object();
     try payload.put("user", user);
 
-    return @"2fa".redirect2fa(request, params.email, 5, "/account/register/2fa", payload, .{ .subject = "register", .to = &.{params.email} });
+    return lib.@"2fa".redirect2fa(request, params.email, 5, "/account/register/2fa", payload, .{ .subject = "register", .to = &.{params.email} });
 }
 
 test "bismi_allah_index" {

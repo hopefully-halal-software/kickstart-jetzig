@@ -2,8 +2,7 @@
 // la ilaha illa Allah Mohammed Rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
-const security = @import("../../lib/security.zig");
-const @"2fa" = @import("../../lib/2fa.zig");
+const lib = @import("../../lib/all.zig");
 
 pub const layout = "main";
 
@@ -15,8 +14,8 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
 
     const root = try request.data(.object);
 
-    const data = try security.parseValueFromEncryptedBase64(request, params.data);
-    if (try @"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
+    const data = try lib.security.parseValueFromEncryptedBase64(request, params.data);
+    if (try lib.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
 
     try root.put("data", params.data);
 
@@ -46,8 +45,8 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     };
     const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
 
-    const data = try security.parseValueFromEncryptedBase64(request, params.data);
-    if (try @"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
+    const data = try lib.security.parseValueFromEncryptedBase64(request, params.data);
+    if (try lib.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
 
     const expected_code = data.getT(.string, "code") orelse return request.fail(.internal_server_error);
 

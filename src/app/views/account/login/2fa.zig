@@ -3,8 +3,8 @@
 
 const std = @import("std");
 const jetzig = @import("jetzig");
-const tests = @import("../../../lib/tests.zig");
-const security = @import("../../../lib/security.zig");
+
+const lib = @import("../../../lib/all.zig");
 
 pub const layout = "main";
 
@@ -16,7 +16,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     };
     const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
 
-    const payload = try security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
+    const payload = try lib.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
     const user = payload.get("user") orelse {
         try root.put("message", "something went wrong");

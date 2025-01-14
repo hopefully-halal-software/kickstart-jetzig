@@ -3,8 +3,7 @@
 
 const std = @import("std");
 const jetzig = @import("jetzig");
-const db = @import("../lib/db.zig");
-const tests = @import("../lib/tests.zig");
+const lib = @import("../lib/all.zig");
 
 pub const layout = "main";
 
@@ -34,7 +33,7 @@ test "bismi_allah_index: is logged in" {
     var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
     defer app.deinit();
 
-    try tests.login(&app);
+    try lib.tests.login(&app);
 
     const response = try app.request(.GET, "/account", .{});
     try response.expectStatus(.ok);
