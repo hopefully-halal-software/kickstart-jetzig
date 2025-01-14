@@ -4,6 +4,7 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 const db = @import("../../lib/db.zig");
+const @"2fa" = @import("../../lib/2fa.zig");
 
 pub const layout = "main";
 
@@ -33,34 +34,15 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         return request.render(.conflict);
     }
 
-    var code_2fa_buffer: [3]u8 = undefined;
-    std.crypto.random.bytes(&code_2fa_buffer);
-    // const code_2fa = std.fmt.bytesToHex(code_2fa_buffer, .lower);
-    // try data.string(code_2fa)
-    const code_2fa = data.string(&std.fmt.bytesToHex(code_2fa_buffer, .lower));
-
-    const session = try request.session();
-
     var user = try data.object();
     try user.put("name", data.string(params.name));
     try user.put("email", data.string(params.email));
     try user.put("password", data.string(params.password));
 
-    var session_2fa_register = try data.object();
-    try session_2fa_register.put("user", user);
-    try session_2fa_register.put("code", code_2fa);
-    try session.put("2fa_register", session_2fa_register);
+    var payload = try data.object();
+    try payload.put("user", user);
 
-    try root.put("code_2fa", code_2fa);
-
-    const mailer = request.mail("2fa", .{ .subject = "idz: email verification for registration", .to = &.{params.email} });
-    try mailer.deliver(.background, .{});
-
-    return request.redirect("/account/register/2fa", .found);
-
-    // try root.put("message", "alhamdo li Allah cerdintials were correct<br>now you will -incha2Allah- be redirected to confirm 2fa code");
-    // return request.render(.created);
-
+    return @"2fa".redirect2fa(request, params.email, 5, "/account/register/2fa", payload, .{ .subject = "register", .to = &.{params.email} });
 }
 
 test "bismi_allah_index" {

@@ -5,59 +5,24 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 const db = @import("../../../lib/db.zig");
 const tests = @import("../../../lib/tests.zig");
+const security = @import("../../../lib/security.zig");
 
 pub const layout = "main";
-
-pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
-
-    const session = try request.session();
-
-    if (session.get("2fa_register")) |_2fa_register| {
-        const user = _2fa_register.getT(.object, "user") orelse return request.redirect("/account/register", .found);
-
-        const email = user.getT(.string, "email") orelse return request.redirect("/account/register", .found);
-
-        var email_sensored_buffer = try request.allocator.alloc(u8, email.len);
-        std.mem.copyForwards(u8, email_sensored_buffer, email);
-
-        var i: usize = 3;
-        while (i < email_sensored_buffer.len - 5) : (i += 1) {
-            email_sensored_buffer[i] = '*';
-        }
-
-        try root.put("email_sensored", email_sensored_buffer);
-    } else return request.redirect("/account/register", .found);
-
-    return request.render(.ok);
-}
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = try data.root(.object);
 
     const Params = struct {
-        code_2fa: []const u8,
+        payload_encrypted: []const u8,
     };
-    const params = try request.expectParams(Params) orelse {
-        try root.put("message", data.string("you need to pass argument 'code_2fa'"));
-        return request.fail(.unprocessable_entity);
-    };
+    const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
 
-    const session = try request.session();
-    const _2fa_register = (session.get("2fa_register")) orelse return request.redirect("/account/register", .found);
-    const code_2fa_session = _2fa_register.getT(.string, "code") orelse return request.redirect("/account/register", .found);
+    const payload = try security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
-    if (!std.mem.eql(u8, params.code_2fa, code_2fa_session)) {
-        try root.put("message", "wrong 2fa code");
-        return request.render(.unauthorized);
-    }
-
-    const user = _2fa_register.getT(.object, "user") orelse {
+    const user = payload.get("user") orelse {
         try root.put("message", "something went wrong");
         return request.render(.internal_server_error);
     };
-
-    _ = try session.remove("2fa_register");
 
     var conn = try db.acquire(request);
     defer conn.release();

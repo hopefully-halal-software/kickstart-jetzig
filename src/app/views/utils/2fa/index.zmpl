@@ -4,6 +4,7 @@
     <form method="post" action="#">
       {{context.authenticityFormElement()}}
       <input type="text" name="code_2fa" />
+      <input type="hidden" name="data" value={{ .data }} />
       <nav>
         <button type="submit">confirm</button>
         <div></div>
