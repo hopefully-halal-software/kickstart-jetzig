@@ -1,8 +1,18 @@
+// بسم الله الرحمن الرحيم
+// la ilaha illa Allah Mohammed rassoul Allah
 const std = @import("std");
 const builtin = @import("builtin");
 
+const db = @import("app/lib/db.zig");
+const pg = @import("pg");
+
 const jetzig = @import("jetzig");
 const zmd = @import("zmd");
+
+pub const GlobalStruct = struct {
+    pool: *pg.Pool,
+};
+pub const Global = GlobalStruct;
 
 pub const routes = @import("routes");
 pub const static = @import("static");
@@ -12,6 +22,7 @@ pub const jetzig_options = struct {
     /// Middleware chain. Add any custom middleware here, or use middleware provided in
     /// `jetzig.middleware` (e.g. `jetzig.middleware.HtmxMiddleware`).
     pub const middleware: []const type = &.{
+        jetzig.middleware.AntiCsrfMiddleware,
         // jetzig.middleware.HtmxMiddleware,
         // jetzig.middleware.CompressionMiddleware,
         // @import("app/middleware/DemoMiddleware.zig"),
@@ -75,54 +86,86 @@ pub const jetzig_options = struct {
     // milliseconds.
     pub const job_worker_sleep_interval_ms: usize = 10;
 
-    /// Key-value store options. Set backend to `.file` to use a file-based store.
-    /// When using `.file` backend, you must also set `.file_options`.
-    /// The key-value store is exposed as `request.store` in views and is also available in as
-    /// `env.store` in all jobs/mailers.
-    pub const store: jetzig.kv.Store.KVOptions = .{
+    /// HTTP cookie configuration
+    pub const cookies: jetzig.http.Cookies.CookieOptions = switch (jetzig.environment) {
+        .development, .testing => .{
+            .domain = "localhost",
+            .path = "/",
+        },
+        .production => .{
+            .same_site = .lax,
+            .secure = true,
+            .http_only = true,
+            .path = "/",
+        },
+    };
+
+    /// Key-value store options.
+    /// Available backends:
+    /// * memory: Simple, in-memory hashmap-backed store.
+    /// * file: Rudimentary file-backed store.
+    /// * valkey: Valkey-backed store with connection pool.
+    ///
+    /// When using `.file` or `.valkey` backend, you must also set `.file_options` or
+    /// `.valkey_options` respectively.
+    ///
+    /// ## File backend:
+    // .backend = .file,
+    // .file_options = .{
+    //     .path = "/path/to/jetkv-store.db",
+    //     .truncate = false, // Set to `true` to clear the store on each server launch.
+    //     .address_space_size = jetzig.jetkv.JetKV.FileBackend.addressSpace(4096),
+    // },
+    //
+    // ## Valkey backend
+    // .backend = .valkey,
+    // .valkey_options = .{
+    //     .host = "localhost",
+    //     .port = 6379,
+    //     .timeout = 1000, // in milliseconds, i.e. 1 second.
+    //     .connect = .lazy, // Connect on first use, or `auto` to connect on server startup.
+    //     .buffer_size = 8192,
+    //     .pool_size = 8,
+    // },
+    /// Available configuration options for `store`, `job_queue`, and `cache` are identical.
+    ///
+    /// For production deployment, the `valkey` backend is recommended for all use cases.
+    ///
+    /// The general-purpose key-value store is exposed as `request.store` in views and is also
+    /// available in as `env.store` in all jobs/mailers.
+    pub const store: jetzig.kv.Store.Options = .{
         .backend = .memory,
-        // .backend = .file,
-        // .file_options = .{
-        //     .path = "/path/to/jetkv-store.db",
-        //     .truncate = false, // Set to `true` to clear the store on each server launch.
-        //     .address_space_size = jetzig.jetkv.JetKV.FileBackend.addressSpace(4096),
-        // },
     };
 
     /// Job queue options. Identical to `store` options, but allows using different
     /// backends (e.g. `.memory` for key-value store, `.file` for jobs queue.
     /// The job queue is managed internally by Jetzig.
-    pub const job_queue: jetzig.kv.Store.KVOptions = .{
+    pub const job_queue: jetzig.kv.Store.Options = .{
         .backend = .memory,
-        // .backend = .file,
-        // .file_options = .{
-        //     .path = "/path/to/jetkv-queue.db",
-        //     .truncate = false, // Set to `true` to clear the store on each server launch.
-        //     .address_space_size = jetzig.jetkv.JetKV.FileBackend.addressSpace(4096),
-        // },
     };
 
     /// Cache options. Identical to `store` options, but allows using different
     /// backends (e.g. `.memory` for key-value store, `.file` for cache.
-    pub const cache: jetzig.kv.Store.KVOptions = .{
+    pub const cache: jetzig.kv.Store.Options = .{
         .backend = .memory,
-        // .backend = .file,
-        // .file_options = .{
-        //     .path = "/path/to/jetkv-cache.db",
-        //     .truncate = false, // Set to `true` to clear the store on each server launch.
-        //     .address_space_size = jetzig.jetkv.JetKV.FileBackend.addressSpace(4096),
-        // },
     };
 
     /// SMTP configuration for Jetzig Mail. It is recommended to use a local SMTP relay,
     /// e.g.: https://github.com/juanluisbaptiste/docker-postfix
-    // pub const smtp: jetzig.mail.SMTPConfig = .{
-    //     .port = 25,
-    //     .encryption = .none, // .insecure, .none, .tls, .start_tls
-    //     .host = "localhost",
-    //     .username = null,
-    //     .password = null,
-    // };
+    ///
+    /// Each configuration option can be overridden with environment variables:
+    /// `JETZIG_SMTP_PORT`
+    /// `JETZIG_SMTP_ENCRYPTION`
+    /// `JETZIG_SMTP_HOST`
+    /// `JETZIG_SMTP_USERNAME`
+    /// `JETZIG_SMTP_PASSWORD`
+    pub const smtp: jetzig.mail.SMTPConfig = .{
+        .port = 25,
+        .encryption = .none, // .insecure, .none, .tls, .start_tls
+        .host = "localhost",
+        .username = null,
+        .password = null,
+    };
 
     /// Force email delivery in development mode (instead of printing email body to logger).
     pub const force_development_email_delivery = false;
@@ -190,8 +233,25 @@ pub fn main() !void {
     const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
     defer if (builtin.mode == .Debug) std.debug.assert(gpa.deinit() == .ok);
 
+    var pool: *pg.Pool = undefined;
+    pool = try pg.Pool.init(allocator, .{ .size = jetzig_options.worker_count, .connect = .{
+        .port = 5432,
+        .host = "127.0.0.1",
+    }, .auth = .{
+        .username = "postgres",
+        .database = "bismi_allah_db",
+        .password = "bismi_allah",
+        .timeout = 10_000,
+    } });
+
+    try db.initDb(pool);
+    defer db.deinit(pool);
+
     var app = try jetzig.init(allocator);
     defer app.deinit();
 
-    try app.start(routes, .{});
+    var global: GlobalStruct = undefined;
+    global = GlobalStruct{ .pool = pool };
+
+    try app.start(routes, .{ .global = &global });
 }

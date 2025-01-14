@@ -1,0 +1,67 @@
+/* بسم الله الرحمن الرحيم */
+/* la ilaha illa Allah Mohammed rassoul Allah */
+
+header {
+    background-color: rgb(17, 24, 39);
+
+    ul {
+        display: flex;
+        flex-direction: row;
+        list-style-type: none;
+        margin: 0;
+
+        li {
+            margin: auto;
+            width: max-content;
+            height: max-content;
+        }
+
+
+        a {
+            text-decoration: none;
+            font-size: 1.5rem;
+            color: white;
+        }
+    }
+}
+
+body {
+    margin: 0;
+}
+
+main {
+    /*display: block;*/
+    width: 80vw;
+    margin: 2rem auto 0 auto;
+}
+
+button.collapsible-list {
+    display: block;
+    width: 100%;
+    margin: auto;
+}
+
+table.collapsible-list {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+    border-spacing: 0;
+
+    td, th {
+        border: none;
+    }
+
+    tr {
+        padding: .5rem;
+        border-radius: .3rem;
+        background-color: rgba(200, 200, 200, 0.4);
+
+        a {
+            text-decoration: none;
+        }
+    }
+
+    tr:nth-of-type(even) {
+        background-color: rgba(200, 200, 200, .6);
+    }
+}
