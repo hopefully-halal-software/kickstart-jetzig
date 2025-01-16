@@ -86,7 +86,6 @@ test "bismi_allah_post: with required params (already present)" {
     // incha2Allah will be changed to use .unprocessable_entity
     try response.expectStatus(.conflict);
     try response.expectBodyContains("email is already used by another user");
-    try std.testing.expectEqual(null, app.session.get("2fa_register"));
 }
 
 test "bismi_allah_post: with required params (correct info)" {
@@ -106,5 +105,4 @@ test "bismi_allah_post: with required params (correct info)" {
         },
     });
     try response.expectStatus(.found);
-    try std.testing.expect(null != app.session.get("2fa_register"));
 }

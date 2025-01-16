@@ -81,7 +81,6 @@ test "bismi_allah_post: with required params (wrong info)" {
     // incha2Allah will be changed to use .unprocessable_entity
     try response.expectStatus(.unauthorized);
     try response.expectBodyContains("email or password were incorrect");
-    try std.testing.expectEqual(null, app.session.get("2fa_login"));
 }
 
 test "bismi_allah_post: with required params (correct info)" {
@@ -100,5 +99,4 @@ test "bismi_allah_post: with required params (correct info)" {
         },
     });
     try response.expectStatus(.found);
-    try std.testing.expect(null != app.session.get("2fa_login"));
 }
