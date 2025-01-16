@@ -3,7 +3,7 @@
 
 const std = @import("std");
 const jetzig = @import("jetzig");
-const lib = @import("../../lib/all.zig");
+const libs = @import("../../lib/all.zig");
 
 pub const layout = "main";
 
@@ -24,11 +24,11 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         return request.fail(.unprocessable_entity);
     };
 
-    var conn = try lib.db.acquire(request);
+    var conn = try libs.db.acquire(request);
     defer conn.release();
 
-    const user = lib.db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
-        lib.db.User.Error.WrongEmail, lib.db.User.Error.WrongPassword => {
+    const user = libs.db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
+        libs.db.User.Error.WrongEmail, libs.db.User.Error.WrongPassword => {
             try root.put("message", data.string("email or password were incorrect"));
             return request.render(.unauthorized);
         },
@@ -38,7 +38,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var payload = try data.object();
     try payload.put("user", user);
 
-    return lib.@"2fa".redirect2fa(request, params.email, 5, "/account/login/2fa", payload, .{ .subject = "login", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, "/account/login/2fa", payload, .{ .subject = "login", .to = &.{params.email} });
 }
 
 test "bismi_allah_index" {
