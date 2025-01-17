@@ -33,7 +33,7 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
         try root.put("email_sensored", email_sensored_buffer);
     }
 
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "utils/2fa/index");
 }
 
 pub fn post(request: *jetzig.Request) !jetzig.View {
@@ -58,7 +58,7 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     try root.put("payload_encrypted", payload_encrypted);
     try root.put("target_url", target_url);
 
-    return request.render(.created);
+    return libs.multiling.render(request, .created, layout, "utils/2fa/post");
 }
 
 test "index" {

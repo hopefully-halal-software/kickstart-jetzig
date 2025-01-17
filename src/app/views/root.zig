@@ -2,11 +2,12 @@
 // la ilaha illa Allah Mohammed rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
+const libs = @import("../lib/all.zig");
 
 pub const layout = "main";
 
 pub fn index(request: *jetzig.Request) !jetzig.View {
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "root/index");
 }
 
 // bismi Allah

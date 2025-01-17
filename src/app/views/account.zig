@@ -17,7 +17,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     try root.put("user", user);
 
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "account/index");
 }
 
 test "bismi_allah_index: not logged in" {

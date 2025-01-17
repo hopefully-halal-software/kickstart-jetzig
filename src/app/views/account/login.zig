@@ -9,7 +9,7 @@ pub const layout = "main";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     _ = data;
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "account/login/index");
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
