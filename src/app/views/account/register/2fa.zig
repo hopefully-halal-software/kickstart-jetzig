@@ -9,7 +9,7 @@ const libs = @import("../../../lib/all.zig");
 pub const layout = "main";
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
+    _ = try data.root(.object);
 
     const Params = struct {
         payload_encrypted: []const u8,
@@ -19,8 +19,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
     const user = payload.get("user") orelse {
-        try root.put("message", "something went wrong");
-        return request.render(.internal_server_error);
+        return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
     };
 
     var conn = try libs.db.acquire(request);
@@ -29,22 +28,18 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     libs.db.User.insertUser(
         conn,
         user.getT(.string, "name") orelse {
-            try root.put("message", "internal error");
-            return request.render(.internal_server_error);
+            return libs.errors.render(request, .internal_server_error, "internal error", layout);
         },
         user.getT(.string, "email") orelse {
-            try root.put("message", "internal error");
-            return request.render(.internal_server_error);
+            return libs.errors.render(request, .internal_server_error, "internal error", layout);
         },
         user.getT(.string, "password") orelse {
-            try root.put("message", "internal error");
-            return request.render(.internal_server_error);
+            return libs.errors.render(request, .internal_server_error, "internal error", layout);
         },
     ) catch |err| {
         std.debug.print("alhamdo li Allah err: '{any}'\n", .{err});
         if (conn.err) |pge| std.log.err("alhamdo li Allah error: {s}\n", .{pge.message});
-        try root.put("message", "internal error");
-        return request.render(.internal_server_error);
+        return libs.errors.render(request, .internal_server_error, "internal error", layout);
     };
 
     return request.redirect("/account/login", .found);

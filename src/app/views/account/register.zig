@@ -14,7 +14,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
+    _ = try data.root(.object);
 
     const Params = struct {
         name: []const u8,
@@ -22,17 +22,13 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         password: []const u8,
     };
     const params = try request.expectParams(Params) orelse {
-        try root.put("message", data.string("you need to pass argument 'name', 'email' and 'password'"));
-        return request.fail(.unprocessable_entity);
+        return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name', 'email' and 'password'", layout);
     };
 
     var conn = try libs.db.acquire(request);
     defer conn.release();
 
-    if (try libs.db.User.existsByEmail(conn, params.email)) {
-        try root.put("message", data.string("email is already used by another user"));
-        return request.render(.conflict);
-    }
+    if (try libs.db.User.existsByEmail(conn, params.email)) return libs.errors.render(request, .conflict, "email is already used by another user", layout);
 
     var user = try data.object();
     try user.put("name", data.string(params.name));

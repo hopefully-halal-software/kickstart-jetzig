@@ -9,7 +9,7 @@ const libs = @import("../../../lib/all.zig");
 pub const layout = "main";
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
+    _ = try data.root(.object);
 
     const Params = struct {
         payload_encrypted: []const u8,
@@ -18,10 +18,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
-    const user = payload.get("user") orelse {
-        try root.put("message", "something went wrong");
-        return request.render(.internal_server_error);
-    };
+    const user = payload.get("user") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
 
     var session = try request.session();
     try session.put("user", user);
