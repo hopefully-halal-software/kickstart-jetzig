@@ -15,6 +15,9 @@
                 <li><a href="{{ link.href }}">{{ link.title }}</a></li>
             }
         }
+            <li>
+                @partial layouts/all/select_lang
+            </li>
         </ul>
     </div>
 </nav>
