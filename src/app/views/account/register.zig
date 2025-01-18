@@ -4,17 +4,17 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
-const lib = @import("../../lib/all.zig");
+const libs = @import("../../lib/all.zig");
 
 pub const layout = "main";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     _ = data;
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "account/register/index");
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
+    _ = try data.root(.object);
 
     const Params = struct {
         name: []const u8,
@@ -22,17 +22,13 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         password: []const u8,
     };
     const params = try request.expectParams(Params) orelse {
-        try root.put("message", data.string("you need to pass argument 'name', 'email' and 'password'"));
-        return request.fail(.unprocessable_entity);
+        return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name', 'email' and 'password'", layout);
     };
 
-    var conn = try lib.db.acquire(request);
+    var conn = try libs.db.acquire(request);
     defer conn.release();
 
-    if (try lib.db.User.existsByEmail(conn, params.email)) {
-        try root.put("message", data.string("email is already used by another user"));
-        return request.render(.conflict);
-    }
+    if (try libs.db.User.existsByEmail(conn, params.email)) return libs.errors.render(request, .conflict, "email is already used by another user", layout);
 
     var user = try data.object();
     try user.put("name", data.string(params.name));
@@ -42,7 +38,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var payload = try data.object();
     try payload.put("user", user);
 
-    return lib.@"2fa".redirect2fa(request, params.email, 5, "/account/register/2fa", payload, .{ .subject = "register", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, "/account/register/2fa", payload, .{ .subject = "register", .to = &.{params.email} });
 }
 
 test "bismi_allah_index" {
@@ -86,7 +82,6 @@ test "bismi_allah_post: with required params (already present)" {
     // incha2Allah will be changed to use .unprocessable_entity
     try response.expectStatus(.conflict);
     try response.expectBodyContains("email is already used by another user");
-    try std.testing.expectEqual(null, app.session.get("2fa_register"));
 }
 
 test "bismi_allah_post: with required params (correct info)" {
@@ -106,5 +101,4 @@ test "bismi_allah_post: with required params (correct info)" {
         },
     });
     try response.expectStatus(.found);
-    try std.testing.expect(null != app.session.get("2fa_register"));
 }

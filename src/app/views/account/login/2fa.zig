@@ -4,24 +4,21 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
-const lib = @import("../../../lib/all.zig");
+const libs = @import("../../../lib/all.zig");
 
 pub const layout = "main";
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
+    _ = try data.root(.object);
 
     const Params = struct {
         payload_encrypted: []const u8,
     };
     const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
 
-    const payload = try lib.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
+    const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
-    const user = payload.get("user") orelse {
-        try root.put("message", "something went wrong");
-        return request.render(.internal_server_error);
-    };
+    const user = payload.get("user") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
 
     var session = try request.session();
     try session.put("user", user);

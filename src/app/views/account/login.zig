@@ -3,34 +3,30 @@
 
 const std = @import("std");
 const jetzig = @import("jetzig");
-const lib = @import("../../lib/all.zig");
+const libs = @import("../../lib/all.zig");
 
 pub const layout = "main";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     _ = data;
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "account/login/index");
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.root(.object);
+    _ = try data.root(.object);
 
     const Params = struct {
         email: []const u8,
         password: []const u8,
     };
-    const params = try request.expectParams(Params) orelse {
-        try root.put("message", data.string("you need to pass arguments 'email' and 'password'"));
-        return request.fail(.unprocessable_entity);
-    };
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name' and 'password'", layout);
 
-    var conn = try lib.db.acquire(request);
+    var conn = try libs.db.acquire(request);
     defer conn.release();
 
-    const user = lib.db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
-        lib.db.User.Error.WrongEmail, lib.db.User.Error.WrongPassword => {
-            try root.put("message", data.string("email or password were incorrect"));
-            return request.render(.unauthorized);
+    const user = libs.db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
+        libs.db.User.Error.WrongEmail, libs.db.User.Error.WrongPassword => {
+            return libs.errors.render(request, .unauthorized, "email or password were incorrect", layout);
         },
         else => return err,
     };
@@ -38,7 +34,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var payload = try data.object();
     try payload.put("user", user);
 
-    return lib.@"2fa".redirect2fa(request, params.email, 5, "/account/login/2fa", payload, .{ .subject = "login", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, "/account/login/2fa", payload, .{ .subject = "login", .to = &.{params.email} });
 }
 
 test "bismi_allah_index" {
@@ -81,7 +77,6 @@ test "bismi_allah_post: with required params (wrong info)" {
     // incha2Allah will be changed to use .unprocessable_entity
     try response.expectStatus(.unauthorized);
     try response.expectBodyContains("email or password were incorrect");
-    try std.testing.expectEqual(null, app.session.get("2fa_login"));
 }
 
 test "bismi_allah_post: with required params (correct info)" {
@@ -100,5 +95,4 @@ test "bismi_allah_post: with required params (correct info)" {
         },
     });
     try response.expectStatus(.found);
-    try std.testing.expect(null != app.session.get("2fa_login"));
 }

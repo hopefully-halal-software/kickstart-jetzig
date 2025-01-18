@@ -3,7 +3,7 @@
 
 const std = @import("std");
 const jetzig = @import("jetzig");
-const lib = @import("../lib/all.zig");
+const libs = @import("../lib/all.zig");
 
 pub const layout = "main";
 
@@ -17,7 +17,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     try root.put("user", user);
 
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "account/index");
 }
 
 test "bismi_allah_index: not logged in" {
@@ -33,7 +33,7 @@ test "bismi_allah_index: is logged in" {
     var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));
     defer app.deinit();
 
-    try lib.tests.login(&app);
+    try libs.tests.login(&app);
 
     const response = try app.request(.GET, "/account", .{});
     try response.expectStatus(.ok);

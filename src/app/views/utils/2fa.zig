@@ -2,7 +2,7 @@
 // la ilaha illa Allah Mohammed Rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
-const lib = @import("../../lib/all.zig");
+const libs = @import("../../lib/all.zig");
 
 pub const layout = "main";
 
@@ -14,8 +14,8 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
 
     const root = try request.data(.object);
 
-    const data = try lib.security.parseValueFromEncryptedBase64(request, params.data);
-    if (try lib.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
+    const data = try libs.security.parseValueFromEncryptedBase64(request, params.data);
+    if (try libs.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
 
     try root.put("data", params.data);
 
@@ -33,7 +33,7 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
         try root.put("email_sensored", email_sensored_buffer);
     }
 
-    return request.render(.ok);
+    return libs.multiling.render(request, .ok, layout, "utils/2fa/index");
 }
 
 pub fn post(request: *jetzig.Request) !jetzig.View {
@@ -45,8 +45,8 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     };
     const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
 
-    const data = try lib.security.parseValueFromEncryptedBase64(request, params.data);
-    if (try lib.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
+    const data = try libs.security.parseValueFromEncryptedBase64(request, params.data);
+    if (try libs.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
 
     const expected_code = data.getT(.string, "code") orelse return request.fail(.internal_server_error);
 
@@ -58,7 +58,7 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     try root.put("payload_encrypted", payload_encrypted);
     try root.put("target_url", target_url);
 
-    return request.render(.created);
+    return libs.multiling.render(request, .created, layout, "utils/2fa/post");
 }
 
 test "index" {

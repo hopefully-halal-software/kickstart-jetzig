@@ -8,7 +8,7 @@
     </head>
     <body>
         <header>
-            @partial layouts/main/nav
+            @partial layouts/en/main/nav
         </header>
         <main>{{zmpl.content}}</main>
         <footer></footer>
