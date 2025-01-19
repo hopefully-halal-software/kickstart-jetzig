@@ -1,3 +1,3 @@
 <section>
-    <h1>bismi Allah</h1>
+    <h1>بسم الله</h1>
 </section>
