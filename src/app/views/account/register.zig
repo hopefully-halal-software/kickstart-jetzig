@@ -22,13 +22,15 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         password: []const u8,
     };
     const params = try request.expectParams(Params) orelse {
-        return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name', 'email' and 'password'", layout);
+        // return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name', 'email' and 'password'", layout);
+        return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments_name_email_and_password, layout);
     };
 
     var conn = try libs.db.acquire(request);
     defer conn.release();
 
-    if (try libs.db.User.existsByEmail(conn, params.email)) return libs.errors.render(request, .conflict, "email is already used by another user", layout);
+    // if (try libs.db.User.existsByEmail(conn, params.email)) return libs.errors.render(request, .conflict, "email is already used by another user", layout);
+    if (try libs.db.User.existsByEmail(conn, params.email)) return libs.errors.render(request, .conflict, .email_already_used, layout);
 
     var user = try data.object();
     try user.put("name", data.string(params.name));

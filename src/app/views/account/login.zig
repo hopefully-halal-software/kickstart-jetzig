@@ -19,14 +19,16 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         email: []const u8,
         password: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name' and 'password'", layout);
+    // const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name' and 'password'", layout);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments_name_and_password, layout);
 
     var conn = try libs.db.acquire(request);
     defer conn.release();
 
     const user = libs.db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
         libs.db.User.Error.WrongEmail, libs.db.User.Error.WrongPassword => {
-            return libs.errors.render(request, .unauthorized, "email or password were incorrect", layout);
+            // return libs.errors.render(request, .unauthorized, "email or password were incorrect", layout);
+            return libs.errors.render(request, .unauthorized, .incorrect_email_or_password, layout);
         },
         else => return err,
     };

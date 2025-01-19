@@ -17,7 +17,8 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
         email: []const u8,
         password: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'email'", layout);
+    // const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'email'", layout);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_argument_email, layout);
 
     var payload = try request.response_data.object();
     try payload.put("email", params.email);

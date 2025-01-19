@@ -18,7 +18,8 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
-    const user = payload.get("user") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+    // const user = payload.get("user") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+    const user = payload.get("user") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
 
     var session = try request.session();
     try session.put("user", user);

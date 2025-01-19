@@ -18,8 +18,10 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
-    const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
-    const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+    // const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+    // const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+    const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
+    const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
 
     var conn = try libs.db.acquire(request);
     defer conn.release();
