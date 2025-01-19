@@ -6,5 +6,6 @@
       <nav>
         <button type="submit">login</button>
         <a href="/account/register">register</a>
+        <a href="/account/recovery">forgot your password?</a>
       </nav>
     </form>

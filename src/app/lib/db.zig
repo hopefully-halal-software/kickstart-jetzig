@@ -244,6 +244,36 @@ pub const User = struct {
         result.deinit();
     }
 
+    pub fn setPassword(conn: *pg.Conn, email: []const u8, new_password: []const u8) !void {
+        var stmt = try conn.prepare("UPDATE users SET password_hash = $1, password_salt = $2 WHERE email = $3");
+        errdefer stmt.deinit();
+
+        var password_salt: [12]u8 = undefined;
+        var password_hash: [64]u8 = undefined;
+        // generate password salt
+        {
+            var password_salt_raw: [6]u8 = undefined;
+            std.crypto.random.bytes(&password_salt_raw);
+            password_salt = std.fmt.bytesToHex(&password_salt_raw, .lower);
+        }
+        // generate password hash
+        {
+            var password_and_salt_buffer: [max_password_size + password_salt_length]u8 = undefined;
+            std.mem.copyForwards(u8, password_and_salt_buffer[0..new_password.len], new_password);
+            std.mem.copyForwards(u8, password_and_salt_buffer[new_password.len..], &password_salt);
+
+            var password_hash_raw: [std.crypto.hash.sha2.Sha256.digest_length]u8 = undefined;
+            std.crypto.hash.sha2.Sha256.hash(password_and_salt_buffer[0 .. new_password.len + password_salt_length], &password_hash_raw, .{});
+            password_hash = std.fmt.bytesToHex(password_hash_raw, .lower);
+        }
+
+        try stmt.bind(password_hash);
+        try stmt.bind(password_salt);
+        try stmt.bind(email);
+        var result = try stmt.execute();
+        try result.drain();
+    }
+
     pub fn deleteUserByEmail(conn: *pg.Conn, email: []const u8) !void {
         var stmt = conn.prepare("DELETE FROM users WHERE email = $1") catch |err| {
             std.debug.print("alhamdo li Allah delete error: '{any}'\n", .{err});

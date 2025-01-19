@@ -4,8 +4,8 @@
       <input type="email" name="email" placeholder="email" required>
       <input type="password" name="password" placeholder="password" required>
       <nav>
-        <button type="submit">تسجيل الدخول</button>
-        <a href="/account/register">إنشاء حساب</a>
-        <a href="/account/recovery">نسيت كلمة المرور؟</a>
+        <button type="submit">reset password</button>
+        <a href="/account/register">register</a>
+        <a href="/account/login">login</a>
       </nav>
     </form>
