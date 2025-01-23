@@ -4,3 +4,9 @@ zig-cache/
 .jetzig
 .zig-cache/
 log/
+static/
+.bundle
+bundle.tar.gz
+node_modules/
+public/styles.css
+package*
