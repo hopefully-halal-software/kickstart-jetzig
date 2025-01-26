@@ -1,0 +1,3 @@
+@args id: []const u8 = "", input_type: []const u8 = "text", name: []const u8 = "", value: []const u8 = "", placeholder: []const u8 = "", extra_classes: []const u8 = "", extra_attributes: []const u8 = ""
+
+<input id="{{ id }}" type="{{ input_type }}" name="{{ name }}" value="{{ value }}" placeholder="{{ placeholder }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 {{ extra_classes }}" {{ extra_attributes }}/>
