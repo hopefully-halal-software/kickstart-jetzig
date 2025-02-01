@@ -15,6 +15,9 @@ const Errors = enum {
     incorrect_params,
     incorrect_email_or_password,
     email_already_used,
+    email_does_no_exist,
+    time_out,
+    token_expired,
 };
 
 pub fn errorToString(err: Errors, lang: multiling.Languages) []const u8 {
@@ -47,6 +50,10 @@ pub fn errorToString(err: Errors, lang: multiling.Languages) []const u8 {
             .en => "email is already used by another user",
             .ar => "البريد الإلكتروني مستعمل",
         },
+        .email_does_no_exist => switch (lang) {
+            .en => "email does not exist",
+            .ar => "البريد الإلكتروني غير موجود",
+        },
         .incorrect_params => switch (lang) {
             .en => "incorrect params",
             .ar => "معلومات خاطئة",
@@ -54,6 +61,14 @@ pub fn errorToString(err: Errors, lang: multiling.Languages) []const u8 {
         .incorrect_email_or_password => switch (lang) {
             .en => "email or password were incorrect",
             .ar => "البريد الإلكتروني أو كلمة المرور خاطئة",
+        },
+        .time_out => switch (lang) {
+            .en => "time out",
+            .ar => "إنتهى الوقت",
+        },
+        .token_expired => switch (lang) {
+            .en => "token expired",
+            .ar => "الرمز منتهي الصلاحية",
         },
     };
 }

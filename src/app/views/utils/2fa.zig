@@ -10,17 +10,17 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
     const Params = struct {
         data: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments, layout);
 
     const root = try request.data(.object);
 
     const data = try libs.security.parseValueFromEncryptedBase64(request, params.data);
-    if (try libs.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
+    if (try libs.@"2fa".parseDataRenderOnError(request, data, layout)) |capture| return capture;
 
     try root.put("data", params.data);
 
     {
-        const email = data.getT(.string, "email") orelse return request.fail(.internal_server_error);
+        const email = data.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
 
         var email_sensored_buffer = try request.allocator.alloc(u8, email.len);
         std.mem.copyForwards(u8, email_sensored_buffer, email);
@@ -43,17 +43,17 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
         data: []const u8,
         code_2fa: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments, layout);
 
     const data = try libs.security.parseValueFromEncryptedBase64(request, params.data);
-    if (try libs.@"2fa".parseDataRedirectOnError(request, data)) |capture| return capture;
+    if (try libs.@"2fa".parseDataRenderOnError(request, data, layout)) |capture| return capture;
 
-    const expected_code = data.getT(.string, "code") orelse return request.fail(.internal_server_error);
+    const expected_code = data.getT(.string, "code") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
 
-    if (!std.mem.eql(u8, expected_code, params.code_2fa)) return request.fail(.unauthorized);
+    if (!std.mem.eql(u8, expected_code, params.code_2fa)) return libs.errors.render(request, .unauthorized, .incorrect_params, layout);
 
-    const payload_encrypted = data.getT(.string, "payload") orelse return request.fail(.internal_server_error);
-    const target_url = data.getT(.string, "target_url") orelse return request.fail(.internal_server_error);
+    const payload_encrypted = data.getT(.string, "payload") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
+    const target_url = data.getT(.string, "target_url") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
 
     try root.put("payload_encrypted", payload_encrypted);
     try root.put("target_url", target_url);

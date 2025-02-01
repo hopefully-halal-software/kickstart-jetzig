@@ -14,7 +14,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const Params = struct {
         payload_encrypted: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments, layout);
 
     const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 

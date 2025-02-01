@@ -10,12 +10,12 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
     const Params = struct {
         data: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments, layout);
 
     const root = try request.data(.object);
 
     const data = try libs.security.parseValueFromEncryptedBase64(request, params.data);
-    if (try libs.payment.parseDataRedirectOnError(request, data)) |capture| return capture;
+    if (try libs.payment.parseDataRenderOnError(request, data, layout)) |capture| return capture;
 
     try root.put("data", params.data);
     try root.put("data_decrypted", data);
@@ -29,17 +29,17 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     const Params = struct {
         data: []const u8,
     };
-    const params = try request.expectParams(Params) orelse return request.fail(.unprocessable_entity);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments, layout);
 
     const data = try libs.security.parseValueFromEncryptedBase64(request, params.data);
-    if (try libs.payment.parseDataRedirectOnError(request, data)) |capture| return capture;
+    if (try libs.payment.parseDataRenderOnError(request, data, layout)) |capture| return capture;
 
     if (.production == jetzig.environment) {
         @compileError("alhamdo li Allah, you need to implement payment logic to make it work in production :) \n");
     }
 
-    const payload_encrypted = data.getT(.string, "payload") orelse return request.fail(.internal_server_error);
-    const target_url = data.getT(.string, "target_url") orelse return request.fail(.internal_server_error);
+    const payload_encrypted = data.getT(.string, "payload") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
+    const target_url = data.getT(.string, "target_url") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
 
     try root.put("payload_encrypted", payload_encrypted);
     try root.put("target_url", target_url);

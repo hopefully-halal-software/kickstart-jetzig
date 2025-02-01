@@ -20,7 +20,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         password: []const u8,
     };
     // const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name' and 'password'", layout);
-    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments_name_and_password, layout);
+    const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments, layout);
 
     const user = get_user: {
         const query = jetzig.database.Query(.User).findBy(.{ .email = params.email });

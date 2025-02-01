@@ -3,6 +3,7 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 const security = @import("security.zig");
+const errors = @import("errors.zig");
 
 pub const @"2fa_path" = "/utils/2fa";
 
@@ -38,13 +39,13 @@ pub fn redirect2fa(request: *jetzig.Request, email: []const u8, expire_after_min
     return request.redirect(path, .found);
 }
 
-pub fn parseDataRedirectOnError(request: *jetzig.Request, data: *jetzig.Data.Value) !?jetzig.View {
+pub fn parseDataRenderOnError(request: *jetzig.Request, data: *jetzig.Data.Value, layout: ?[]const u8) !?jetzig.View {
     const timestamp = std.time.timestamp();
 
     // check expire
     {
-        const expire = data.getT(.integer, "expire") orelse return request.fail(.internal_server_error);
-        if (expire < timestamp) return request.fail(.unprocessable_entity);
+        const expire = data.getT(.integer, "expire") orelse return try errors.render(request, .internal_server_error, .internal_error, layout);
+        if (expire < timestamp) return try errors.render(request, .unprocessable_entity, .token_expired, layout);
     }
 
     return null;

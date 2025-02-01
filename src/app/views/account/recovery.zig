@@ -20,6 +20,8 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     // const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'email'", layout);
     const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_argument_email, layout);
 
+    if (null == try request.repo.execute(jetzig.database.Query(.User).findBy(.{ .email = params.email }))) return libs.errors.render(request, .unauthorized, .email_does_no_exist, layout);
+
     var payload = try request.response_data.object();
     try payload.put("email", params.email);
     try payload.put("password", params.password);
