@@ -6,6 +6,6 @@
 
     <form action="/account/logout" method="post">
         {{context.authenticityFormElement()}}
-        @partial partials/input/button("تسجيل الخروج", "submit", "mt-8")
+        @partial partials/input/button("Logout", "submit", "mt-8")
     </form>
 </div>

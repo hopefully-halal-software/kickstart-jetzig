@@ -3,16 +3,10 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-const db = @import("app/lib/db.zig");
 const pg = @import("pg");
 
 const jetzig = @import("jetzig");
 const zmd = @import("zmd");
-
-pub const GlobalStruct = struct {
-    pool: *pg.Pool,
-};
-pub const Global = GlobalStruct;
 
 pub const routes = @import("routes");
 pub const static = @import("static");
@@ -85,6 +79,9 @@ pub const jetzig_options = struct {
     // Duration before looking for more Jobs when the queue is found to be empty, in
     // milliseconds.
     pub const job_worker_sleep_interval_ms: usize = 10;
+
+    /// Database Schema. Set to `@import("Schema")` to load `src/app/database/Schema.zig`.
+    pub const Schema = @import("Schema");
 
     /// HTTP cookie configuration
     pub const cookies: jetzig.http.Cookies.CookieOptions = switch (jetzig.environment) {
@@ -233,25 +230,8 @@ pub fn main() !void {
     const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
     defer if (builtin.mode == .Debug) std.debug.assert(gpa.deinit() == .ok);
 
-    var pool: *pg.Pool = undefined;
-    pool = try pg.Pool.init(allocator, .{ .size = jetzig_options.worker_count, .connect = .{
-        .port = 5432,
-        .host = "127.0.0.1",
-    }, .auth = .{
-        .username = "postgres",
-        .database = "bismi_allah_db",
-        .password = "bismi_allah",
-        .timeout = 10_000,
-    } });
-
-    try db.initDb(pool);
-    defer db.deinit(pool);
-
     var app = try jetzig.init(allocator);
     defer app.deinit();
 
-    var global: GlobalStruct = undefined;
-    global = GlobalStruct{ .pool = pool };
-
-    try app.start(routes, .{ .global = &global });
+    try app.start(routes, .{});
 }

@@ -5,6 +5,9 @@ const jetzig = @import("jetzig");
 
 pub const Cipher = std.crypto.aead.chacha_poly.XChaCha20Poly1305;
 
+pub const password_salt_length: u8 = 12;
+pub const max_password_size: u8 = 128;
+
 /// bismi Allah:
 /// create an `*jetzig.Data.Value` from an
 /// encypted then base64-encoded `*jetzig.Data.Value`

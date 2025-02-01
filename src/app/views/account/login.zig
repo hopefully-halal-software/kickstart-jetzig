@@ -22,15 +22,28 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     // const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, "you need to pass argument 'name' and 'password'", layout);
     const params = try request.expectParams(Params) orelse return libs.errors.render(request, .unprocessable_entity, .need_to_pass_arguments_name_and_password, layout);
 
-    var conn = try libs.db.acquire(request);
-    defer conn.release();
+    const user = get_user: {
+        const query = jetzig.database.Query(.User).findBy(.{ .email = params.email });
 
-    const user = libs.db.User.getAuth(conn, params.email, params.password, data) catch |err| switch (err) {
-        libs.db.User.Error.WrongEmail, libs.db.User.Error.WrongPassword => {
-            // return libs.errors.render(request, .unauthorized, "email or password were incorrect", layout);
-            return libs.errors.render(request, .unauthorized, .incorrect_email_or_password, layout);
-        },
-        else => return err,
+        const user = try request.repo.execute(query) orelse return libs.errors.render(request, .unauthorized, .incorrect_email_or_password, layout);
+
+        // check_password
+        {
+            var buff_in: [libs.security.max_password_size + libs.security.password_salt_length]u8 = undefined;
+            std.mem.copyForwards(u8, buff_in[0..params.password.len], params.password);
+            std.mem.copyForwards(u8, buff_in[params.password.len..], user.password_salt);
+
+            var buff_out: [std.crypto.hash.sha2.Sha256.digest_length]u8 = undefined;
+            std.crypto.hash.sha2.Sha256.hash(buff_in[0 .. params.password.len + libs.security.password_salt_length], &buff_out, .{});
+
+            const buff_password_hash_hex: [64]u8 = std.fmt.bytesToHex(buff_out, .lower);
+
+            if (!std.mem.eql(u8, user.password_hash, &buff_password_hash_hex)) {
+                return libs.errors.render(request, .unauthorized, .incorrect_email_or_password, layout);
+            }
+        }
+
+        break :get_user user;
     };
 
     var payload = try data.object();

@@ -16,7 +16,7 @@
         </div>
     
         <div>
-            @partial partials/information/label("password", "كلمة المرور", "font-semibold")
+            @partial partials/information/label("password", "كلمة المرور الجديدة", "font-semibold")
             @partial partials/input/input("password", "password", "password", "", "كلمة المرور", "", "required")
         </div>
     

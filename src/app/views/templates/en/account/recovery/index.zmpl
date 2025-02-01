@@ -16,7 +16,7 @@
         </div>
     
         <div>
-            @partial partials/information/label("password", "Password", "font-semibold")
+            @partial partials/information/label("password", "New Password", "font-semibold")
             @partial partials/input/input("password", "password", "password", "", "password", "", "required")
         </div>
     

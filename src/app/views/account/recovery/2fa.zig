@@ -18,15 +18,39 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 
     const payload = try libs.security.parseValueFromEncryptedBase64(request, params.payload_encrypted);
 
-    // const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
-    // const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
-    const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
-    const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
+    // set password
+    {
+        // const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+        // const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, "something went wrong", layout);
+        const email = payload.getT(.string, "email") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
+        const password = payload.getT(.string, "password") orelse return libs.errors.render(request, .internal_server_error, .something_went_wrong, layout);
 
-    var conn = try libs.db.acquire(request);
-    defer conn.release();
+        var password_salt: [12]u8 = undefined;
+        var password_hash: [64]u8 = undefined;
+        // generate password salt
+        {
+            var password_salt_raw: [6]u8 = undefined;
+            std.crypto.random.bytes(&password_salt_raw);
+            password_salt = std.fmt.bytesToHex(&password_salt_raw, .lower);
+        }
+        // generate password hash
+        {
+            var password_and_salt_buffer: [libs.security.max_password_size + libs.security.password_salt_length]u8 = undefined;
+            std.mem.copyForwards(u8, password_and_salt_buffer[0..password.len], password);
+            std.mem.copyForwards(u8, password_and_salt_buffer[password.len..], &password_salt);
 
-    try libs.db.User.setPassword(conn, email, password);
+            var password_hash_raw: [std.crypto.hash.sha2.Sha256.digest_length]u8 = undefined;
+            std.crypto.hash.sha2.Sha256.hash(password_and_salt_buffer[0 .. password.len + libs.security.password_salt_length], &password_hash_raw, .{});
+            password_hash = std.fmt.bytesToHex(password_hash_raw, .lower);
+        }
+
+        const query = jetzig.database.Query(.User)
+            .update(.{
+            .password_hash = &password_hash,
+            .password_salt = &password_salt,
+        }).where(.{ .email = email });
+        try request.repo.execute(query);
+    }
 
     return request.redirect("/account/login", .found);
 }
