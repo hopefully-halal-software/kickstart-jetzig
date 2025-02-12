@@ -8,10 +8,9 @@ pub const database = .{
     // .testing = .{
     //     .adapter = .null,
     // },
-
-    .production = .{
-        .adapter = .null,
-    },
+    // .production = .{
+    //     .adapter = .null,
+    // },
 
     // PostgreSQL adapter configuration.
     //
@@ -34,20 +33,19 @@ pub const database = .{
 
     .development = .{
         .adapter = .postgresql,
-        .hostname = "localhost",
+        .hostname = "127.0.0.1",
         .port = 5432,
         .username = "postgres",
         .password = "bismi_allah",
-        .database = "bismi_allah_db",
+        .database = "bismi_allah",
     },
 
-    //
-    // .production = .{
-    //     .adapter = .postgresql,
-    //     .hostname = "localhost",
-    //     .port = 5432,
-    //     .username = "postgres",
-    //     .password = "password",
-    //     .database = "myapp_production",
-    // },
+    .production = .{
+        .adapter = .postgresql,
+        .hostname = "127.0.0.1",
+        .port = 5432,
+        .username = "postgres",
+        .password = "bismi_allah",
+        .database = "bismi_allah",
+    },
 };
