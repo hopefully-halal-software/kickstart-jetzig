@@ -38,7 +38,11 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
             }
         }
 
-        break :get_user user;
+        break :get_user .{
+            .name = user.name,
+            .email = user.email,
+            .created_at = user.created_at,
+        };
     };
 
     var payload = try request.response_data.object();
