@@ -30,14 +30,30 @@ services.nginx = {
 
       extraConfig = ''
         proxy_intercept_errors on;
-        error_page 404 502 503 @fallback;
+        error_page 404 502 503 @svelte;
+        if ($request_method !~ ^(GET|HEAD)$) {
+          proxy_pass http://localhost:8080;
+          break;
+        }
+        try_files $uri @backend @svelte;
       '';
     };
 
+    locations."/api" = {
+      proxyPass = "http://localhost:8080";
+    };
+
+    locations."@backend" = {
+      proxyPass = "http://localhost:8080";
+    };
+
     # Fallback location for the second backend
-    locations."@fallback" = {
+    locations."@svelte" = {
       proxyPass = "http://localhost:5173";
+       extraConfig = ''
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+      '';
     };
   };
 };
-
