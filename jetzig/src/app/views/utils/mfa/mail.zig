@@ -2,7 +2,7 @@
 // la ilaha illa Allah Mohammed Rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
-const libs = @import("../../lib/all.zig");
+const libs = @import("../../../lib/all.zig");
 
 pub const layout = "main";
 
