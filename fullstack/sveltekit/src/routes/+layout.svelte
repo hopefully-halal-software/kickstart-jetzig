@@ -48,6 +48,7 @@
             <li><a href="#" class="hover:text-primary" onclick={() => (isOpen = false)}>Pricing</a></li>
             <li><a href="#" class="hover:text-primary" onclick={() => (isOpen = false)}>Contact</a></li>
         </ul>
+        <LightSwitch />
     </div>
 {/if}
 
