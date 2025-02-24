@@ -1,6 +1,7 @@
 // بسم الله الرحمن الرحيم
 // la ilaha illa Allah Mohammed Rassoul Allah
 
+import { goto } from '$app/navigation';
 import { global } from '$lib/shared.svelte';
 
 // In a SvelteKit + Svelte file (e.g., +page.js or +layout.js)
@@ -12,6 +13,10 @@ export async function load() {
   const response = await fetch('/api/v1/account/info.json');
   
   if (!response.ok) {
+    if (401 === response.status) {
+      goto('/account/login');
+      return;
+    }
     throw new Error('Failed to fetch account information');
   }
 
