@@ -1,23 +1,22 @@
 <script>
-	import '../app.css';
+    import '../app.css';
 
-	import LightSwitch from '$lib/components/LightSwitch.svelte';
-
+    import LightSwitch from '$lib/components/LightSwitch.svelte';
 
     import IconMenu from 'lucide-svelte/icons/menu';
     import IconX from 'lucide-svelte/icons/x';
 
-    let isOpen = $state(false);
+    let menu_open = $state(false);
 
-	const links = [
-		{ name: 'Home', href: '/' },
-		{ name: 'Account', href: '/account' },
-	];
+    const links = [
+        { name: 'Home', href: '/' },
+	{ name: 'Account', href: '/account' },
+    ];
 
-	let { children } = $props();
+    let { children } = $props();
 </script>
 
-<header class="w-full bg-surface-100 dark:bg-surface-900 shadow-md">
+<header class="sticky top-0 z-10 w-full backdrop-blur-sm bg-surface-100 dark:bg-surface-900 shadow-md">
     <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Logo -->
         <a href="/" class="text-xl font-bold text-primary">
@@ -26,27 +25,28 @@
 
         <!-- Desktop Navigation -->
         <ul class="hidden md:flex gap-6 text-lg">
-            <li><a href="/account" class="hover:text-primary">Account</a></li>
-            <li><a href="/" class="hover:text-primary">Pricing</a></li>
-            <li><a href="/" class="hover:text-primary">Contact</a></li>
+            {#each links as _link}
+                <li><a href={_link.href} class="hover:text-primary">{_link.name}</a></li>
+            {/each}
+            <LightSwitch />
         </ul>
 
         <!-- Mobile Menu Button -->
-        <button class="md:hidden" onclick={() => (isOpen = true)}>
+        <button class="md:hidden" onclick={() => (menu_open = true)}>
             <IconMenu size="24" />
         </button>
     </nav>
 
-    {#if isOpen}
-    <div class="fixed inset-0 bg-black/50 z-40" onclick={() => (isOpen = false)}>dnjdfndsjnj</div>
+    {#if menu_open}
+    <button aria-label="Open menu" class="fixed inset-0 bg-black/50 z-40" onclick={() => (menu_open = false)}></button>
     <div class="fixed top-0 left-0 w-64 h-full bg-surface-100 dark:bg-surface-900 z-50">
-        <button class="btn" onclick={() => (isOpen = false)}>
+        <button class="btn" onclick={() => (menu_open = false)}>
             <IconX size="24" />
         </button>
         <ul class="flex flex-col gap-4 text-lg">
-            <li><a href="#" class="hover:text-primary" onclick={() => (isOpen = false)}>Features</a></li>
-            <li><a href="#" class="hover:text-primary" onclick={() => (isOpen = false)}>Pricing</a></li>
-            <li><a href="#" class="hover:text-primary" onclick={() => (isOpen = false)}>Contact</a></li>
+            {#each links as _link}
+                <li><a href={_link.href} class="hover:text-primary">{_link.name}</a></li>
+            {/each}
         </ul>
         <LightSwitch />
     </div>
