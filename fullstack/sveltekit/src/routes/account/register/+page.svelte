@@ -6,6 +6,11 @@
 
 <form action="#" method="POST" class="card border-[1px] border-neutral-500 preset-filled-surface-100-900 w-full max-w-md space-y-4 p-4 mx-auto md:my-48 my-12">
 	<label class="label">
+		<span class="label-text">Name</span>
+		<input class="input" type="text" name="name" placeholder="Abdu Allah" />
+	</label>
+
+	<label class="label">
 		<span class="label-text">Email</span>
 		<input class="input" type="text" name="email" placeholder="bismi-allah@alhamdo-li-allah.com" />
 	</label>
@@ -15,23 +20,19 @@
 		<input class="input" type="password" name="password" placeholder="******" />
 	</label>
 
-	<fieldset class="flex justify-between">
-        <a class="text-secondary-500 underline" href="/account/recovery">
-            forgot passwoord?
-        </a>
-
+	<fieldset class="flex justify-end">
 		<!-- Button -->
 		<button type="submit" class="btn preset-filled-primary-500">
-            Login
-        </button>
+			Register
+		</button>
 	</fieldset>
 
 	<hr class="hr border-t-2" />
 
     <p class="flex justify-between">
-        <span>don't have an account?</span>
-        <a href="/account/register" class="font-semibold text-indigo-600 hover:text-indigo-500">
-            Register
+        <span>already have an account?</span>
+        <a href="/account/login" class="font-semibold text-indigo-600 hover:text-indigo-500">
+            Login
         </a>
     </p>
 </form>
