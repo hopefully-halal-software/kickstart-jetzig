@@ -37,8 +37,6 @@ pub fn index(request: *jetzig.Request) !jetzig.View {
 }
 
 pub fn post(request: *jetzig.Request) !jetzig.View {
-    var root = try request.data(.object);
-
     const Params = struct {
         data: []const u8,
         code_2fa: []const u8,
@@ -53,12 +51,9 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     if (!std.mem.eql(u8, expected_code, params.code_2fa)) return libs.errors.render(request, .unauthorized, .incorrect_params, layout);
 
     const payload_encrypted = data.getT(.string, "payload") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
-    const target_url = data.getT(.string, "target_url") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
+    const action = data.getT(.string, "action") orelse return libs.errors.render(request, .internal_server_error, .internal_error, layout);
 
-    try root.put("payload_encrypted", payload_encrypted);
-    try root.put("target_url", target_url);
-
-    return libs.multiling.render(request, .created, layout, "utils/2fa/post");
+    return libs.actions.call(request, action, payload_encrypted);
 }
 
 test "index" {

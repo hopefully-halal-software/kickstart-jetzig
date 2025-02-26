@@ -4,6 +4,7 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 const security = @import("security.zig");
 const errors = @import("errors.zig");
+const Actions = @import("actions.zig").Actions;
 
 pub const payment_path = "/utils/payment";
 
@@ -14,13 +15,13 @@ pub const Currencies = enum {
     USD, // repoted use by some westners hhhhhhh
 };
 
-pub fn redirectPayment(request: *jetzig.Request, amount: i32, currency: Currencies, expire_after_minutes: i34, target_url: []const u8, payload: *jetzig.Data.Value) !jetzig.View {
+pub fn redirectPayment(request: *jetzig.Request, amount: i32, currency: Currencies, expire_after_minutes: i34, action: Actions, payload: *jetzig.Data.Value) !jetzig.View {
     _ = try request.data(.object);
 
     var value = try request.response_data.object();
     try value.put("payload", request.response_data.string(try security.encodeValueToEncryptedBase64(request, payload)));
     try value.put("expire", request.response_data.integer(std.time.timestamp() + (expire_after_minutes * 60)));
-    try value.put("target_url", request.response_data.string(target_url));
+    try value.put("action", request.response_data.string(@tagName(action)));
     try value.put("amount", request.response_data.integer(amount));
     try value.put("currency", request.response_data.string(@tagName(currency)));
 

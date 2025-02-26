@@ -4,17 +4,18 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 const security = @import("security.zig");
 const errors = @import("errors.zig");
+const Actions = @import("actions.zig").Actions;
 
 pub const @"2fa_path" = "/utils/mfa/mail";
 
-pub fn redirect2fa(request: *jetzig.Request, email: []const u8, expire_after_minutes: i34, target_url: []const u8, payload: *jetzig.Data.Value, mail_params: jetzig.mail.MailParams) !jetzig.View {
+pub fn redirect2fa(request: *jetzig.Request, email: []const u8, expire_after_minutes: i34, action: Actions, payload: *jetzig.Data.Value, mail_params: jetzig.mail.MailParams) !jetzig.View {
     var root = try request.data(.object);
 
     var value = try request.response_data.object();
     try value.put("payload", request.response_data.string(try security.encodeValueToEncryptedBase64(request, payload)));
     try value.put("expire", request.response_data.integer(std.time.timestamp() + (expire_after_minutes * 60)));
     try value.put("email", request.response_data.string(email));
-    try value.put("target_url", request.response_data.string(target_url));
+    try value.put("action", request.response_data.string(@tagName(action)));
 
     {
         var code_buffer: [6]u8 = undefined;
