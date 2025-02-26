@@ -14,23 +14,10 @@
 		<input class="input" type="password" name="password" placeholder="******" />
 	</label>
 
-	<fieldset class="flex justify-between">
-        <a class="text-secondary-500 underline" href="/account/recovery">
-            forgot passwoord?
-        </a>
-
+	<fieldset class="flex justify-end">
 		<!-- Button -->
-		<button type="submit" class="btn preset-filled-primary-500">
-            Login
-        </button>
+	  <button type="submit" class="btn preset-filled-primary-500">
+            Confirm
+          </button>
 	</fieldset>
-
-	<hr class="hr border-t-2" />
-
-    <p class="flex justify-between">
-        <span>don't have an account?</span>
-        <a href="/account/register" class="font-semibold text-indigo-600 hover:text-indigo-500">
-            Register
-        </a>
-    </p>
 </form>
