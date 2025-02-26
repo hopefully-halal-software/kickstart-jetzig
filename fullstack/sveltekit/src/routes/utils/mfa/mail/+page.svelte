@@ -3,7 +3,8 @@
   import AuthenticityFormElement from "$lib/components/authenticityFormElement.svelte";
 </script>
 
-<form action="#" method="POST" class="card border-[1px] border-neutral-500 preset-filled-surface-100-900 w-full max-w-md space-y-4 p-4 mx-auto md:my-48 my-12">
+<form action="#" method="POST" class="card border-[1px] border-neutral-500 preset-filled-surface-100-900 w-full max-w-md space-y-4 p-4 mx-auto mt-32">
+    <h1 class="text-2xl text-center">Email Verification</h1>
     <AuthenticityFormElement {data}/>
     <input type="text" name="data" value={data.encrypted_data} hidden />
     <label class="label">
