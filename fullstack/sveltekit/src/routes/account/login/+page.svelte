@@ -1,9 +1,3 @@
-<script>
-	import IconBookmark from 'lucide-svelte/icons/bookmark';
-	const diagramCircle = 'preset-tonal w-8 aspect-square flex justify-center items-center rounded-full';
-    import { Heart } from 'lucide-svelte';
-</script>
-
 <form action="#" method="POST" class="card border-[1px] border-neutral-500 preset-filled-surface-100-900 w-full max-w-md space-y-4 p-4 mx-auto md:my-48 my-12">
 	<label class="label">
 		<span class="label-text">Email</span>

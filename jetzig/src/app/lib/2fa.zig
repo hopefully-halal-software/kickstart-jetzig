@@ -5,7 +5,7 @@ const jetzig = @import("jetzig");
 const security = @import("security.zig");
 const errors = @import("errors.zig");
 
-pub const @"2fa_path" = "/utils/2fa";
+pub const @"2fa_path" = "/utils/mfa/mail";
 
 pub fn redirect2fa(request: *jetzig.Request, email: []const u8, expire_after_minutes: i34, target_url: []const u8, payload: *jetzig.Data.Value, mail_params: jetzig.mail.MailParams) !jetzig.View {
     var root = try request.data(.object);
