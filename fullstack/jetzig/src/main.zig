@@ -17,6 +17,7 @@ pub const jetzig_options = struct {
         // jetzig.middleware.HtmxMiddleware,
         // jetzig.middleware.CompressionMiddleware,
         // @import("app/middleware/DemoMiddleware.zig"),
+        @import("app/middleware/AntiCsrfMiddleware.zig"),
     };
 
     // Maximum bytes to allow in request body.

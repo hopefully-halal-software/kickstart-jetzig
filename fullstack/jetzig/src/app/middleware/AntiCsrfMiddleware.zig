@@ -1,5 +1,5 @@
 const std = @import("std");
-const jetzig = @import("../../jetzig.zig");
+const jetzig = @import("jetzig");
 
 pub const middleware_name = "anti_csrf";
 
@@ -12,7 +12,7 @@ const TokenParams = @Type(.{
             .name = jetzig.authenticity_token_name ++ "",
             .type = []const u8,
             .is_comptime = false,
-            .default_value_ptr = null,
+            .default_value = null,
             .alignment = @alignOf([]const u8),
         }},
     },
@@ -37,13 +37,6 @@ fn verifyCsrfToken(request: *jetzig.http.Request) !void {
         .DELETE, .PATCH, .PUT, .POST => {},
         else => return,
     }
-
-    // switch (request.requestFormat()) {
-    //     .HTML, .UNKNOWN => {},
-    //     // We do not authenticate JSON requests. Users must implement their own authentication
-    //     // system or disable JSON endpoints that should be protected.
-    //     .JSON => return,
-    // }
 
     const session = try request.session();
 

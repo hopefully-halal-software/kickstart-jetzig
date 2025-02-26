@@ -10,7 +10,7 @@
 	</label>
 
 	<label class="label">
-		<span class="label-text">Password</span>
+		<span class="label-text">New Password</span>
 		<input class="input" type="password" name="password" placeholder="******" />
 	</label>
 

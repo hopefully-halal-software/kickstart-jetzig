@@ -1,4 +1,9 @@
+<script>
+  let { data } = $props();
+  import AuthenticityFormElement from "$lib/components/authenticityFormElement.svelte";
+</script>
 <form action="#" method="POST" class="card border-[1px] border-neutral-500 preset-filled-surface-100-900 w-full max-w-md space-y-4 p-4 mx-auto md:my-48 my-12">
+	<AuthenticityFormElement {data}/>
 	<label class="label">
 		<span class="label-text">Name</span>
 		<input class="input" type="text" name="name" placeholder="Abdu Allah" />
