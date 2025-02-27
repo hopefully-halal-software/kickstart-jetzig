@@ -16,8 +16,8 @@
 
     .dependencies = .{
         .jetzig = .{
-            .url = "https://github.com/jetzig-framework/jetzig/archive/5ebb60d7593ed8c0ba567889c7dc6ce8065b0742.tar.gz",
-            .hash = "1220f444298a1b18b9f3a87cc9c439ca50edaeb31d10ae6bd98edb64f7d37a197cb7",
+            .url = "https://github.com/IbrahimOuhamou/jetzig/archive/7e5a8b6ad62de83cf6249e8da13e0acb0fe5e7e4.tar.gz",
+            .hash = "12202d4052382dc93aace5b726d8e959500a21619aa7150273af703359d7c404b323",
         },
     },
     .paths = .{
