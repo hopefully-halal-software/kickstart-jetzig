@@ -5,15 +5,15 @@ import { goto } from '$app/navigation';
 import { global } from '$lib/shared.svelte';
 
 // In a SvelteKit + Svelte file (e.g., +page.js or +layout.js)
-export async function load() {
+export async function load({ url }) {
   if(global.user) return {
     user: global.user,
   };
 
-  const response = await fetch('/api/v1/account/info.json');
+  const response = await window.fetch('/api/v1/account/info.json');
   
   if (!response.ok) {
-    if (401 === response.status) {
+    if (401 === response.status && window.location.pathname === '/account') {
       goto('/account/login');
       return;
     }
