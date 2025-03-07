@@ -4,6 +4,7 @@
 
   import { fetchToast } from '$lib/CustomFetch.js';
   import { goto } from '$app/navigation';
+  import { removeUser, removeXcsrfToken, fetchXcsrfToken } from '$lib/shared.svelte.js';
 
 </script>
 
@@ -22,8 +23,12 @@
       <span class="font-semibold">Created At:</span>
       <span>{new Date(user.created_at).toLocaleString()}</span>
     </p>
-    <form class="mt-3 pl-3" onsubmit={(e) => {
-        fetchToast('/api/v1/account/logout.json', {}).then(() => goto('/account/login')).cach(()=>{});
+    <form class="mt-3 pl-3" onsubmit={async (e) => {
+        await fetchToast('/api/v1/account/logout.json', {});
+        await removeUser();
+        await removeXcsrfToken();
+        await fetchXcsrfToken();
+        goto('/account/login');
       }}
     >
       <button type="submit" class="btn preset-filled-error-500">Logout</button>

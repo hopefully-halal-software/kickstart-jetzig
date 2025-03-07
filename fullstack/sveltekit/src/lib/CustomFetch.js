@@ -27,3 +27,19 @@ export async function fetchToast(path, params) {
   }
 }
 
+export async function fetchToastGet(path) {
+  const xcsrf = global.xcsrf;
+  try {
+    const response = await fetch(path);
+
+    const r_json = await response.json();
+    if (r_json.error_message) {
+     throw new Error(r_json.error_message);
+    }
+
+    return r_json;
+  } catch (err) {
+    toast.error(err.message);
+  }
+}
+
