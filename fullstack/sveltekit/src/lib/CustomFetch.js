@@ -12,7 +12,7 @@ export async function fetchToast(path, params) {
       method: "post",
       body: JSON.stringify({
         ...params,
-        // [xcsrf.name]: xcsrf.value,
+        [xcsrf.name]: xcsrf.value,
       }),
     });
 
