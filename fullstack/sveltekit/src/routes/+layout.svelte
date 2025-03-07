@@ -1,6 +1,7 @@
 <script>
     import '../app.css';
 
+    import { Toaster } from 'svelte-sonner';
     import LightSwitch from '$lib/components/LightSwitch.svelte';
 
     import IconMenu from 'lucide-svelte/icons/menu';
@@ -53,7 +54,7 @@
 {/if}
 
 </header>
-
+<Toaster richColors position="top-center" />
 
 <main>
 {@render children()}

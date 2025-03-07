@@ -37,7 +37,9 @@ pub fn login(request: *jetzig.Request, payload: *jetzig.Data.Value) !jetzig.View
     var session = try request.session();
     try session.put("user", user);
 
-    return request.redirect("/account", .found);
+    var root = try request.data(.object);
+    try root.put("path", "/account");
+    return request.render(.ok);
 }
 
 pub fn register(request: *jetzig.Request, payload: *jetzig.Data.Value) !jetzig.View {
@@ -79,7 +81,9 @@ pub fn register(request: *jetzig.Request, payload: *jetzig.Data.Value) !jetzig.V
         try request.repo.execute(query);
     }
 
-    return request.redirect("/account/login", .found);
+    var root = try request.data(.object);
+    try root.put("path", "/account/login");
+    return request.render(.ok);
 }
 
 pub fn recover_account(request: *jetzig.Request, payload: *jetzig.Data.Value) !jetzig.View {
@@ -117,5 +121,7 @@ pub fn recover_account(request: *jetzig.Request, payload: *jetzig.Data.Value) !j
         try request.repo.execute(query);
     }
 
-    return request.redirect("/account/login", .found);
+    var root = try request.data(.object);
+    try root.put("path", "/account/login");
+    return request.render(.ok);
 }

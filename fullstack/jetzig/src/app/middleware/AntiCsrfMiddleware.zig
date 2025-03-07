@@ -1,6 +1,8 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
+const render = @import("../lib/render.zig").render;
+
 pub const middleware_name = "anti_csrf";
 
 const TokenParams = @Type(.{
@@ -28,8 +30,8 @@ pub fn beforeRender(request: *jetzig.http.Request, route: jetzig.views.Route) !v
 }
 
 fn logFailure(request: *jetzig.http.Request) !void {
-    _ = request.fail(.forbidden);
     try request.server.logger.DEBUG("Anti-CSRF token validation failed. Request aborted.", .{});
+    _ = try render(request, .forbidden, "invalid Anti-CSRF token");
 }
 
 fn verifyCsrfToken(request: *jetzig.http.Request) !void {

@@ -5,7 +5,7 @@ const jetzig = @import("jetzig");
 const security = @import("security.zig");
 const render = @import("render.zig").render;
 
-pub const payment_path = "/api/v1/utils/payment";
+pub const payment_path = "/utils/payment";
 
 /// supported languages
 pub const Currencies = enum {
@@ -15,7 +15,7 @@ pub const Currencies = enum {
 };
 
 pub fn redirectPayment(request: *jetzig.Request, amount: i32, currency: Currencies, expire_after_minutes: i34, target_url: []const u8, payload: *jetzig.Data.Value) !jetzig.View {
-    _ = try request.data(.object);
+    var root = try request.data(.object);
 
     var value = try request.response_data.object();
     try value.put("payload", request.response_data.string(try security.encodeValueToEncryptedBase64(request, payload)));
@@ -26,9 +26,10 @@ pub fn redirectPayment(request: *jetzig.Request, amount: i32, currency: Currenci
 
     const data = try security.encodeValueToEncryptedBase64(request, value);
 
-    const path = try std.mem.concat(request.allocator, u8, &.{ payment_path, "?data=", data });
+    try root.put("data", data);
+    try root.put("path", payment_path);
 
-    return request.redirect(path, .found);
+    return request.render(.ok);
 }
 
 pub fn parseDataRenderOnError(request: *jetzig.Request, data: *jetzig.Data.Value) !?jetzig.View {

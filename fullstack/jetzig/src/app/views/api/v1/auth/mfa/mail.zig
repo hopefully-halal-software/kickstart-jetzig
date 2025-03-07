@@ -2,11 +2,11 @@
 // la ilaha illa Allah Mohammed Rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
-const libs = @import("../../../lib/all.zig");
+const libs = @import("../../../../../lib/all.zig");
 
-// pub const formats: jetzig.Route.Formats = .{
-//     .post = &.{.json},
-// };
+pub const formats: jetzig.Route.Formats = .{
+    .post = &.{.json},
+};
 
 pub fn post(request: *jetzig.Request) !jetzig.View {
     const Params = struct {

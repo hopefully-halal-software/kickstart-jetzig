@@ -30,14 +30,16 @@ pub fn redirect2fa(request: *jetzig.Request, email: []const u8, expire_after_min
         try root.put("code_2fa", code);
 
         const mailer = request.mail("2fa", mail_params);
-        try mailer.deliver(.background, .{});
+        try mailer.deliver(.now, .{});
+        _ = root.object.remove("code_2fa");
     }
 
     const data = try security.encodeValueToEncryptedBase64(request, value);
 
-    const path = try std.mem.concat(request.allocator, u8, &.{ @"2fa_path", "?data=", data });
+    try root.put("data", data);
+    try root.put("path", @"2fa_path");
 
-    return request.redirect(path, .found);
+    return request.render(.ok);
 }
 
 pub fn parseDataRenderOnError(request: *jetzig.Request, data: *jetzig.Data.Value) !?jetzig.View {

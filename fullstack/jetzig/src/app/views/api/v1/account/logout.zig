@@ -2,12 +2,16 @@
 // la ilaha illa Allah Mohammed rassoul Allah
 const std = @import("std");
 const jetzig = @import("jetzig");
-const tests = @import("../../lib/tests.zig");
+const tests = @import("../../../../lib/tests.zig");
+
+pub const formats: jetzig.Route.Formats = .{
+    .post = &.{.json},
+};
 
 pub fn post(request: *jetzig.Request) !jetzig.View {
     const session = try request.session();
     try session.reset();
-    return request.redirect("/account/login", .found);
+    return request.render(.ok);
 }
 
 test "bismi_allah_post: no csrf" {

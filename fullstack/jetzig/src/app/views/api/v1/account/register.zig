@@ -3,11 +3,11 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
-const libs = @import("../../lib/all.zig");
+const libs = @import("../../../../lib/all.zig");
 
-// pub const formats: jetzig.Route.Formats = .{
-//     .post = &.{.json},
-// };
+pub const formats: jetzig.Route.Formats = .{
+    .post = &.{.json},
+};
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     _ = try data.root(.object);

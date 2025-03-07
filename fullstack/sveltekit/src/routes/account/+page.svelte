@@ -1,7 +1,10 @@
 <script>
   let { data } = $props();
   const user = data.user;
-  import AuthenticityFormElement from "$lib/components/authenticityFormElement.svelte";
+
+  import { fetchToast } from '$lib/CustomFetch.js';
+  import { goto } from '$app/navigation';
+
 </script>
 
 <div class="container mx-auto mt-12">
@@ -19,8 +22,10 @@
       <span class="font-semibold">Created At:</span>
       <span>{new Date(user.created_at).toLocaleString()}</span>
     </p>
-    <form class="mt-3 pl-3" action="/account/logout" method="POST">
-      <AuthenticityFormElement {data}/>
+    <form class="mt-3 pl-3" onsubmit={(e) => {
+        fetchToast('/api/v1/account/logout.json', {}).then(() => goto('/account/login')).cach(()=>{});
+      }}
+    >
       <button type="submit" class="btn preset-filled-error-500">Logout</button>
     </form>
   </div>
