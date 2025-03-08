@@ -19,7 +19,8 @@ export async function fetchUser() {
   const response = await window.fetch('/api/v1/account/info.json');
 
   if (!response.ok) {
-    throw new Error('Failed to fetch account information');
+    if(401 === response.status) return null;
+    throw new Error(`Failed to fetch account information: status ${response.status}`);
   }
 
   const data = await response.json();
