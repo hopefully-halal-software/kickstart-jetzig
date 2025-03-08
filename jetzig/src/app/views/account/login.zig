@@ -49,7 +49,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var payload = try data.object();
     try payload.put("user", user);
 
-    return libs.@"2fa".redirect2fa(request, params.email, 5, .login, payload, .{ .subject = "login", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, .login, payload, .{ .subject = "login", .to = &.{.{ .email = params.email }} });
 }
 
 test "bismi_allah_index" {

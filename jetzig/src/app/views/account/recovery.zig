@@ -26,7 +26,7 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     try payload.put("email", params.email);
     try payload.put("password", params.password);
 
-    return libs.@"2fa".redirect2fa(request, params.email, 5, .recover_account, payload, .{ .subject = "recovery", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, .recover_account, payload, .{ .subject = "recovery", .to = &.{.{ .email = params.email }} });
 }
 
 test "index" {

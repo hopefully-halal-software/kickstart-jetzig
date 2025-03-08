@@ -50,7 +50,7 @@ pub fn post(request: *jetzig.Request) !jetzig.View {
     try payload.put("user", user);
 
     // return libs.@"2fa".redirect2fa(request, params.email, 5, "/api/v1/auth/account/login/2fa", payload, .{ .subject = "login", .to = &.{params.email} });
-    return libs.@"2fa".redirect2fa(request, params.email, 5, libs.actions.Actions.login, payload, .{ .subject = "login", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, libs.actions.Actions.login, payload, .{ .subject = "login", .to = &.{.{ .email = params.email }} });
 }
 
 test "post" {

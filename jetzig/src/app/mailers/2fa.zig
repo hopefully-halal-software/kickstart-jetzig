@@ -4,12 +4,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
-// Default values for this mailer.
-pub const defaults: jetzig.mail.DefaultMailParams = .{
-    .from = "no-reply@example.com",
-    .subject = "2fa verification",
-};
-
 // The `deliver` function is invoked every time this mailer is used to send an email.
 // Use this function to set default mail params (e.g. a default `from` address or
 // `subject`) before the mail is delivered.

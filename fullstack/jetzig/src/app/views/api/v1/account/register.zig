@@ -30,7 +30,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try payload.put("user", user);
 
     // return libs.@"2fa".redirect2fa(request, params.email, 5, "/api/v1/auth/account/register/2fa", payload, .{ .subject = "login", .to = &.{params.email} });
-    return libs.@"2fa".redirect2fa(request, params.email, 5, libs.actions.Actions.register, payload, .{ .subject = "register", .to = &.{params.email} });
+    return libs.@"2fa".redirect2fa(request, params.email, 5, libs.actions.Actions.register, payload, .{ .subject = "register", .to = &.{.{ .email = params.email }} });
 }
 
 test "bismi_allah_index" {
