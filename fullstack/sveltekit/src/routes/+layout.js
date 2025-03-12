@@ -6,10 +6,15 @@ export const prerender = 'auto';
 export const csr = true;
 // export const trailingSlash = 'always';
 
-import { global, fetchXcsrfToken } from '$lib/shared.svelte';
+import { global, fetchXcsrfToken, fetchUser } from '$lib/shared.svelte';
 
 export async function load() {
-	const xcsrf = await fetchXcsrfToken();
+  const xcsrf = await fetchXcsrfToken();
+  try {
+	const user = await fetchUser();
+  } catch(err) {
+    toast.error(err.message);
+  }
 
 	return { xcsrf: global.xcsrf };
 }
