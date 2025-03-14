@@ -9,7 +9,7 @@
 </script>
 
 <div class="container mx-auto mt-12">
-  <div class="card mx-auto w-1/2 px-12 py-7 preset-outlined-surface-200-800 bg-surface-50-950 shadow-xl">
+  <div class="card mx-auto w-1/2 px-12 py-7 preset-outlined-surface-200-800 shadow-xl">
   {#if user}
     <h1 class="text-2xl text-center font-bold">Account Information</h1>
     <p class="mt-4">

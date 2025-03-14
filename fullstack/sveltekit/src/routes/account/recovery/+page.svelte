@@ -16,7 +16,7 @@
     }).catch(() => {});
   }
 </script>
-<form {onsubmit} class="card border-[1px] border-neutral-500 preset-filled-surface-100-900 w-full max-w-md space-y-4 p-4 mx-auto mt-32">
+<form {onsubmit} class="card border-[1px] border-neutral-500 preset-outlined-surface-200-800 w-full max-w-lg space-y-4 p-4 mx-auto mt-12">
 	<h1 class="text-2xl text-center">Recover your Account</h1>
 	<label class="label">
 		<span class="label-text">Email</span>
