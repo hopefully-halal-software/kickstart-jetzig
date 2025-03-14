@@ -17,7 +17,7 @@
     let { children } = $props();
 </script>
 
-<header class="sticky top-0 z-10 w-full backdrop-blur-sm bg-surface-100 dark:bg-surface-900 shadow-md">
+<header class="sticky top-0 z-10 w-full backdrop-blur-xs bg-surface-100 dark:bg-surface-900 shadow-md">
     <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
         <!-- Logo -->
         <a href="/" class="text-xl font-bold text-primary">

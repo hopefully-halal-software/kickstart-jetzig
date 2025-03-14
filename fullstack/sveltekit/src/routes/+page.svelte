@@ -1,5 +1,5 @@
 <div class="container mx-auto text-left p-4 md:text-center">
-	<div class="relative z-[1] space-y-6 pt-32 pb-24">
+	<div class="relative z-1 space-y-6 pt-32 pb-24">
 		<div class="font-bold text-4xl tracking-tight">
 			لا إله إلا <span class="text-tertiary-500">الله</span> محمد رسول الله
 		</div>
