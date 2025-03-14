@@ -9,13 +9,13 @@
 		<div class="flex flex-wrap gap-3 md:space-x-3 md:block">
 			<a 
 				href="https://www.youtube.com/watch?v=1n-zYRZy5NQ"
-				class="bg-primary-300 btn md:w-fit variant-ringed-surface"
+				class="bg-primary-300 btn md:w-fit preset-outlined-surface-500"
 			>
 				Oxford debate
 			</a>
 			<a 
 				href="https://youtube.com/playlist?list=PLPqH38Ki1fy3EB-8xmShVqpbQw99Do2B-&si=dZaEFV-pdpczi_fC"
-				class="md:btn-lg md:w-fit variant-ringed-surface"
+				class="md:btn-lg md:w-fit preset-outlined-surface-500"
 			>
 				Journey of Certainty →
 			</a>
