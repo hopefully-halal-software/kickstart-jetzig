@@ -6,7 +6,7 @@ const jetzig = @import("jetzig");
 
 // Default values for this mailer.
 pub const defaults: jetzig.mail.DefaultMailParams = .{
-    .from = "no-reply@example.com",
+    .from = .{.email = "no-reply@example.com"},
     .subject = "2fa verification",
 };
 
