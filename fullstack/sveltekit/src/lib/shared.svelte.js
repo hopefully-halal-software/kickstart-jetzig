@@ -1,6 +1,8 @@
 // بسم الله الرحمن الرحيم
 // la ilaha illa Allah Mohammed Rassoul Allah
 
+import { toast } from 'svelte-sonner';
+
 export let global = $state({
     // { name: '', email: '', registred_at: '' }
     user: null,

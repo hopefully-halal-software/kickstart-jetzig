@@ -6,6 +6,7 @@ export const prerender = 'auto';
 export const csr = true;
 // export const trailingSlash = 'always';
 
+import { toast } from 'svelte-sonner';
 import { global, fetchXcsrfToken, fetchUser } from '$lib/shared.svelte';
 
 export async function load() {
